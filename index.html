@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GOOD DAY 點餐系統</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root{--red:#7D2020;--red2:#A33030;--cream:#FFF8F0;--warm:#F5E6D3;--text:#2C1810;--accent:#E8B86D;--green:#2E7D32;}
@@ -203,6 +204,23 @@
 // ══════════════════════════════════════════
 //  預設菜單
 // ══════════════════════════════════════════
+// 2. LIFF 初始化設定
+const MY_LIFF_ID = '2009741658-E1Z86q0b'; // 請替換成你在 LINE Developers 取得的 ID
+
+async function initLiff() {
+  try {
+    await liff.init({ liffId: MY_LIFF_ID });
+    if (!liff.isLoggedIn()) {
+      liff.login();
+    } else {
+      // 登入成功後，可以順便抓取使用者名稱顯示在 Logo 旁
+      const profile = await liff.getProfile();
+      document.querySelector('header p').innerText = `你好 ${profile.displayName}，準備好點餐了嗎？`;
+    }
+  } catch (error) {
+    console.error('LIFF 初始化失敗', error);
+  }
+}
 const DEFAULT = {
   toast:{ label:'🍞 吐司類', items:[
     {id:'T1',name:'蛋吐司',price:30},
@@ -415,6 +433,7 @@ async function submitOrder(){
   const num=nextNum();
   const total=totalPrice();
 
+
   // 組成 LINE 訊息
   const lineMsg=
     `━━━━━━━━━━━━━━━━━━\n`+
@@ -469,6 +488,30 @@ async function submitOrder(){
   }
 
   btn.disabled=false; btn.innerHTML='送出訂單';
+
+ // --- 原本的傳送到 Webhook 邏輯保留 ---
+  if(!getWebhook()){
+    statusEl.className='send-status failed';
+    statusEl.innerHTML='⚠️ 尚未設定 GAS 網址';
+  } else {
+    const result = await sendToLine(lineMsg);
+    
+    // --- 3. 新增：直接透過 LIFF 發送訊息給使用者自己 ---
+    if (liff.isInClient()) {
+      await liff.sendMessages([{
+        type: 'text',
+        text: lineMsg // 直接把剛才組好的訂單文字發出去
+      }]).catch(err => console.error("傳送失敗", err));
+    }
+
+    if(result === 'ok'){
+      statusEl.className='send-status success';
+      statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
+    } else {
+      statusEl.className='send-status failed';
+      statusEl.innerHTML='❌ 傳送失敗，請截圖告知店家';
+    }
+  } 
 }
 
 function closeDone(){document.getElementById('successWrap').classList.remove('open');}
@@ -533,6 +576,18 @@ function resetMenu(){if(!confirm('確定要恢復預設菜單？'))return;MENU=c
 // ══════════════════════════════════════════
 renderMenu();
 initTime();
+// 修改前：
+// renderMenu();
+// initTime();
+
+// 修改後：
+async function startApp() {
+  await initLiff(); // 先初始化 LINE
+  renderMenu();     // 再渲染網頁內容
+  initTime();
+}
+
+startApp();
 </script>
 </body>
 </html>
