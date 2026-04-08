@@ -293,7 +293,7 @@ async function sendToLine(msg){
 }
 async function testWebhook(){
   const url=getWebhook();
-  if(!url){alert('請先填入 GAS 網址！');return;}
+  if(!url){alert('https://script.google.com/macros/s/AKfycbwTUSSm2m1B9EbTK1dl8gTVwiUMTOXtXim_k_AcuUmUyo28NV6jTcypewgKuJWPNGoxaQ/exec');return;}
   const btn=document.querySelector('.test-btn');
   btn.textContent='傳送中…'; btn.disabled=true;
   const r=await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！');
