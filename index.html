@@ -445,7 +445,7 @@ async function submitOrder(){
     cart.map(i=>`  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n')+
     `\n──────────────────\n`+
     `💰 合計：$${total}`+
-    (note?`\n📝 備註：${note}`:'')+
+    (note?`\n📝 備註(手機末三碼)：${note}`:'')+
     `\n━━━━━━━━━━━━━━━━━━`;
 
   // 顯示訂單明細
@@ -456,7 +456,7 @@ async function submitOrder(){
     `${'─'.repeat(18)}<br>`+
     cart.map(i=>`${i.name} ×${i.q}　$${i.sub}`).join('<br>')+
     `<br>${'─'.repeat(18)}<br><b>合計：$${total}</b>`+
-    (note?`<br>備註：${note}`:'');
+    (note?`<br>備註(手機末三碼)：${note}`:'');
 
   // 設定傳送狀態
   const statusEl=document.getElementById('sendStatus');
