@@ -171,7 +171,7 @@
     <div class="s-icon">🎉</div>
     <div class="s-label">您的訂單編號</div>
     <div class="s-num" id="sNum">010</div>
-    <div class="s-title" id="sTitle">訂單已送出！</div>
+    <div class="s-title" id="sTitle">訂單明細</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送到店家 LINE…
@@ -450,7 +450,7 @@ async function submitOrder(){
 
   // 顯示訂單明細
   document.getElementById('sNum').textContent=num;
-  document.getElementById('sTitle').textContent='訂單已送出！';
+  document.getElementById('sTitle').textContent='訂單明細';
   document.getElementById('sDetail').innerHTML=
     `<b>訂單 #${num}</b>　⏰ ${time}<br>`+
     `${'─'.repeat(18)}<br>`+
@@ -483,7 +483,7 @@ async function submitOrder(){
       statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
     } else {
       statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 請將訂單截圖回傳，才會準備餐點喔';
+      statusEl.innerHTML='✅ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
     }
   }
 
@@ -492,7 +492,7 @@ async function submitOrder(){
  // --- 原本的傳送到 Webhook 邏輯保留 ---
   if(!getWebhook()){
     statusEl.className='send-status failed';
-    statusEl.innerHTML='⚠️ 請將訂單截圖回傳，才會準備餐點喔';
+    statusEl.innerHTML='⚠️ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
   } else {
     const result = await sendToLine(lineMsg);
     
@@ -509,7 +509,7 @@ async function submitOrder(){
       statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
     } else {
       statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 請將訂單截圖回傳，才會準備餐點喔';
+      statusEl.innerHTML='✅ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
     }
   } 
 }
