@@ -483,7 +483,7 @@ async function submitOrder(){
       statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
     } else {
       statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
+      statusEl.innerHTML='✅ 訂單截圖並回傳官方LINE，才會出餐';
     }
   }
 
@@ -492,7 +492,7 @@ async function submitOrder(){
  // --- 原本的傳送到 Webhook 邏輯保留 ---
   if(!getWebhook()){
     statusEl.className='send-status failed';
-    statusEl.innerHTML='⚠️ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
+    statusEl.innerHTML='⚠️ 訂單截圖並回傳官方LINE，才會出餐';
   } else {
     const result = await sendToLine(lineMsg);
     
@@ -509,7 +509,7 @@ async function submitOrder(){
       statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
     } else {
       statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 請將訂單截圖回傳官方LINE，才會準備餐點喔';
+      statusEl.innerHTML='✅ 訂單截圖並回傳官方LINE，才會出餐';
     }
   } 
 }
