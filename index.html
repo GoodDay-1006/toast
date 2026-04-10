@@ -4,113 +4,159 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GOOD DAY 點餐系統</title>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-  :root{--red:#7D2020;--red2:#A33030;--cream:#FFF8F0;--warm:#F5E6D3;--text:#2C1810;--accent:#E8B86D;--green:#2E7D32;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'Noto Serif TC',serif;background:var(--cream);color:var(--text);min-height:100vh;}
+:root{--red:#7D2020;--cream:#FFF8F0;--warm:#F5E6D3;--text:#2C1810;--accent:#E8B86D;--green:#2E7D32;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Serif TC',serif;background:var(--cream);color:var(--text);min-height:100vh;}
 
-  header{background:var(--red);color:white;padding:18px 20px 14px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.25);}
-  header h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:var(--accent);cursor:default;user-select:none;}
-  header p{font-size:.75rem;opacity:.85;margin-top:2px;}
-  .hours{background:var(--accent);color:var(--red);font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:20px;display:inline-block;margin-top:6px;}
+/* ── HEADER ── */
+header{background:var(--red);color:white;padding:18px 20px 14px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.25);}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:var(--accent);cursor:default;user-select:none;}
+header p{font-size:.75rem;opacity:.85;margin-top:2px;}
+.hours{background:var(--accent);color:var(--red);font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:20px;display:inline-block;margin-top:6px;}
 
-  .tabs{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;background:var(--warm);border-bottom:2px solid #E8D5C0;scrollbar-width:none;}
-  .tabs::-webkit-scrollbar{display:none;}
-  .tab{flex-shrink:0;padding:7px 18px;border-radius:20px;border:2px solid var(--red);background:transparent;color:var(--red);font-family:'Noto Serif TC',serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;}
-  .tab.active,.tab:hover{background:var(--red);color:white;}
+/* ── TABS ── */
+.tabs{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;background:var(--warm);border-bottom:2px solid #E8D5C0;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:7px 18px;border-radius:20px;border:2px solid var(--red);background:transparent;color:var(--red);font-family:'Noto Serif TC',serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.tab.active,.tab:hover{background:var(--red);color:white;}
+.tab.event-tab{border-color:#E67E22;color:#E67E22;}
+.tab.event-tab.active,.tab.event-tab:hover{background:#E67E22;color:white;}
 
-  .section{display:none;padding:16px;}
-  .section.visible{display:block;}
-  .section-title{font-size:1.1rem;font-weight:900;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--accent);}
-  .items{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .item{background:white;border-radius:12px;padding:14px 12px;border:1.5px solid #EDD8C0;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 6px rgba(0,0,0,.06);}
-  .item-name{font-size:.95rem;font-weight:700;}
-  .item-price{font-size:1.05rem;font-weight:900;color:var(--red);}
-  .item-controls{display:flex;align-items:center;gap:6px;margin-top:4px;}
-  .qty-btn{width:30px;height:30px;border-radius:50%;border:2px solid var(--red);background:transparent;color:var(--red);font-size:1.2rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .qty-btn:active{background:var(--red);color:white;}
-  .qty-display{font-size:1.05rem;font-weight:700;min-width:26px;text-align:center;}
+/* ── MENU ── */
+.section{display:none;padding:16px;}
+.section.visible{display:block;}
+.section-title{font-size:1.1rem;font-weight:900;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--accent);}
+.section-title.event-title{color:#E67E22;border-color:#E67E22;}
 
-  .cart-bar{position:fixed;bottom:0;left:0;right:0;background:var(--red);color:white;padding:14px 20px;z-index:200;transform:translateY(100%);transition:transform .3s ease;}
-  .cart-bar.visible{transform:translateY(0);}
-  .cart-bar-inner{display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
-  .cart-count{background:var(--accent);color:var(--red);border-radius:50%;width:22px;height:22px;font-size:.75rem;font-weight:900;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;}
+/* ── ITEM CARDS ── */
+.items{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.item{background:white;border-radius:12px;overflow:hidden;border:1.5px solid #EDD8C0;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,.06);}
+.item-img{width:100%;height:110px;object-fit:cover;display:block;}
+.item-img-placeholder{display:none;}
+.item-body{padding:12px 10px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.item-name{font-size:.92rem;font-weight:700;line-height:1.3;}
+.item-price{font-size:1rem;font-weight:900;color:var(--red);}
+.item-extra{font-size:.78rem;color:#888;line-height:1.4;}
+.item-controls{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.qty-btn{width:30px;height:30px;border-radius:50%;border:2px solid var(--red);background:transparent;color:var(--red);font-size:1.2rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qty-btn:active{background:var(--red);color:white;}
+.qty-display{font-size:1.05rem;font-weight:700;min-width:26px;text-align:center;}
 
-  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:300;align-items:flex-end;}
-  .overlay.open{display:flex;}
-  .sheet{background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 32px;animation:up .28s ease;}
-  @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .sheet-title{font-size:1.15rem;font-weight:900;color:var(--red);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
-  .x-btn{background:#E8D5C0;border:none;border-radius:50%;width:30px;height:30px;font-size:1rem;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;}
+/* ── EVENT ITEMS ── */
+.event-items{display:flex;flex-direction:column;gap:10px;}
+.event-item{background:white;border-radius:12px;padding:14px;border:1.5px solid #FDEBD0;box-shadow:0 2px 6px rgba(0,0,0,.06);}
+.event-badge{display:inline-block;background:#E67E22;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:6px;}
+.event-field{font-size:.82rem;color:#666;margin-top:3px;line-height:1.5;}
+.event-field b{color:var(--text);}
 
-  .cart-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #E8D5C0;gap:8px;}
-  .cart-row-info{flex:1;}
-  .cart-row-name{font-size:.95rem;font-weight:700;}
-  .cart-row-sub{font-size:.78rem;color:#999;margin-top:2px;}
-  .cart-row-price{font-weight:900;color:var(--red);font-size:1rem;white-space:nowrap;}
-  .cart-row-controls{display:flex;align-items:center;gap:4px;}
-  .c-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:1rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .c-btn:active{background:var(--red);color:white;}
-  .c-qty{font-size:.9rem;font-weight:700;min-width:20px;text-align:center;}
+/* ── CART ── */
+.cart-bar{position:fixed;bottom:0;left:0;right:0;background:var(--red);color:white;padding:14px 20px;z-index:200;transform:translateY(100%);transition:transform .3s ease;}
+.cart-bar.visible{transform:translateY(0);}
+.cart-bar-inner{display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.cart-count{background:var(--accent);color:var(--red);border-radius:50%;width:22px;height:22px;font-size:.75rem;font-weight:900;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;}
 
-  .field-group{margin-top:14px;}
-  .field-label{font-size:.85rem;font-weight:700;color:var(--red);margin-bottom:6px;display:block;}
-  .field-row{display:flex;gap:8px;}
-  input[type="date"],select,textarea{font-family:'Noto Serif TC',serif;font-size:.9rem;padding:8px 12px;border:1.5px solid #EDD8C0;border-radius:10px;background:white;color:var(--text);width:100%;}
-  .field-row select{flex:1;}
-  textarea{resize:none;height:68px;}
-  .req{color:var(--red);}
-  .divider{margin-top:16px;padding-top:12px;display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;border-top:2px solid var(--accent);}
+/* ── OVERLAYS / SHEETS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:300;align-items:flex-end;}
+.overlay.open{display:flex;}
+.sheet{background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 32px;animation:up .28s ease;}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-title{font-size:1.15rem;font-weight:900;color:var(--red);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.x-btn{background:#E8D5C0;border:none;border-radius:50%;width:30px;height:30px;font-size:1rem;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;}
 
-  .submit-btn{width:100%;margin-top:14px;padding:15px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:1.05rem;font-weight:700;cursor:pointer;letter-spacing:2px;display:flex;align-items:center;justify-content:center;gap:8px;}
-  .submit-btn:disabled{background:#aaa;cursor:not-allowed;}
-  .clear-btn{width:100%;margin-top:8px;padding:10px;background:transparent;color:#bbb;border:1px solid #ddd;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:.85rem;cursor:pointer;}
+/* ── CART ROWS ── */
+.cart-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #E8D5C0;gap:8px;}
+.cart-row-info{flex:1;}
+.cart-row-name{font-size:.95rem;font-weight:700;}
+.cart-row-sub{font-size:.78rem;color:#999;margin-top:2px;}
+.cart-row-price{font-weight:900;color:var(--red);font-size:1rem;white-space:nowrap;}
+.cart-row-controls{display:flex;align-items:center;gap:4px;}
+.c-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--red);background:transparent;color:var(--red);font-size:1rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.c-btn:active{background:var(--red);color:white;}
+.c-qty{font-size:.9rem;font-weight:700;min-width:20px;text-align:center;}
 
-  /* SUCCESS */
-  .success-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px;}
-  .success-wrap.open{display:flex;}
-  .success-box{background:white;border-radius:20px;padding:28px 22px;text-align:center;width:100%;max-width:360px;max-height:88vh;overflow-y:auto;animation:pop .3s ease;}
-  @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
-  .s-icon{font-size:2.8rem;}
-  .s-label{font-size:.72rem;color:#aaa;margin-top:4px;}
-  .s-num{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--red);letter-spacing:4px;line-height:1;}
-  .s-title{font-size:1rem;font-weight:700;color:var(--text);margin-top:4px;}
-  .s-detail{font-size:.76rem;color:#555;margin-top:10px;line-height:1.75;text-align:left;background:#f9f4ef;border-radius:10px;padding:10px 12px;}
-  /* 傳送狀態 */
-  .send-status{margin-top:12px;padding:12px;border-radius:10px;font-size:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
-  .send-status.sending{background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;}
-  .send-status.success{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;}
-  .send-status.failed{background:#FFEBEE;color:#C62828;border:1px solid #EF9A9A;}
-  .done-btn{margin-top:12px;padding:13px;background:var(--red);color:white;border:none;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;}
+/* ── FORM FIELDS ── */
+.field-group{margin-top:14px;}
+.field-label{font-size:.85rem;font-weight:700;color:var(--red);margin-bottom:6px;display:block;}
+.field-row{display:flex;gap:8px;}
+input[type="date"],select,textarea,input[type="text"],input[type="number"]{font-family:'Noto Serif TC',serif;font-size:.9rem;padding:8px 12px;border:1.5px solid #EDD8C0;border-radius:10px;background:white;color:var(--text);width:100%;}
+.field-row select{flex:1;}
+textarea{resize:none;height:68px;}
+.req{color:var(--red);}
+.divider{margin-top:16px;padding-top:12px;display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;border-top:2px solid var(--accent);}
 
-  /* ADMIN */
-  .admin-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;overflow-y:auto;padding:24px 0;}
-  .admin-wrap.open{display:block;}
-  .admin-box{background:white;border-radius:16px;width:95%;max-width:500px;padding:20px;margin:auto;}
-  .admin-box h2{font-size:1.1rem;color:var(--red);font-weight:900;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-  /* webhook 設定 */
-  .webhook-section{background:var(--warm);border-radius:12px;padding:14px;margin-bottom:18px;}
-  .webhook-section h3{font-size:.9rem;font-weight:900;color:var(--red);margin-bottom:8px;}
-  .webhook-section input{font-family:'Noto Serif TC',serif;font-size:.82rem;padding:8px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;color:var(--text);width:100%;}
-  .webhook-section p{font-size:.72rem;color:#888;margin-top:6px;line-height:1.5;}
-  .test-btn{margin-top:8px;padding:8px 16px;background:var(--red);color:white;border:none;border-radius:8px;font-family:'Noto Serif TC',serif;font-size:.82rem;cursor:pointer;}
-  .admin-sec{margin-bottom:18px;}
-  .admin-sec h3{font-size:.88rem;font-weight:700;color:var(--red);background:var(--warm);padding:6px 10px;border-radius:8px;margin-bottom:8px;}
-  .a-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-  .a-row input{flex:1;font-family:'Noto Serif TC',serif;font-size:.85rem;padding:7px 10px;border:1.5px solid #EDD8C0;border-radius:8px;width:100%;}
-  .a-price{width:70px;flex:none!important;}
-  .del-btn{background:#fee;border:1px solid #fcc;color:#c33;border-radius:8px;padding:6px 9px;cursor:pointer;font-size:.78rem;white-space:nowrap;}
-  .add-btn{background:var(--warm);border:1.5px dashed var(--red);color:var(--red);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:.82rem;font-weight:700;width:100%;margin-top:4px;}
-  .save-btn{background:var(--red);color:white;border:none;border-radius:10px;padding:12px;width:100%;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:10px;}
-  .reset-btn2{background:#fff0f0;border:1px solid #fcc;color:#c33;border-radius:8px;padding:8px;width:100%;font-size:.82rem;cursor:pointer;margin-top:6px;font-family:'Noto Serif TC',serif;}
-  .admin-note{font-size:.72rem;color:#bbb;margin-top:8px;text-align:center;}
+/* ── BUTTONS ── */
+.submit-btn{width:100%;margin-top:14px;padding:15px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:1.05rem;font-weight:700;cursor:pointer;letter-spacing:2px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.clear-btn{width:100%;margin-top:8px;padding:10px;background:transparent;color:#bbb;border:1px solid #ddd;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:.85rem;cursor:pointer;}
 
-  .empty-cart{text-align:center;padding:30px 0;color:#bbb;font-size:.9rem;}
-  .spacer{height:80px;}
-  .spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg)}}
+/* ── SUCCESS ── */
+.success-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.success-wrap.open{display:flex;}
+.success-box{background:white;border-radius:20px;padding:28px 22px;text-align:center;width:100%;max-width:360px;max-height:88vh;overflow-y:auto;animation:pop .3s ease;}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.s-icon{font-size:2.8rem;}
+.s-label{font-size:.72rem;color:#aaa;margin-top:4px;}
+.s-num{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--red);letter-spacing:4px;line-height:1;}
+.s-title{font-size:1rem;font-weight:700;color:var(--text);margin-top:4px;}
+.s-detail{font-size:.76rem;color:#555;margin-top:10px;line-height:1.75;text-align:left;background:#f9f4ef;border-radius:10px;padding:10px 12px;}
+.send-status{margin-top:12px;padding:12px;border-radius:10px;font-size:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
+.send-status.sending{background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;}
+.send-status.success{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;}
+.send-status.failed{background:#FFEBEE;color:#C62828;border:1px solid #EF9A9A;}
+.done-btn{margin-top:12px;padding:13px;background:var(--red);color:white;border:none;border-radius:12px;font-family:'Noto Serif TC',serif;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;}
+
+/* ── ADMIN ── */
+.admin-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;overflow-y:auto;padding:24px 0;}
+.admin-wrap.open{display:block;}
+.admin-box{background:white;border-radius:16px;width:95%;max-width:560px;padding:20px;margin:auto;}
+.admin-box>h2{font-size:1.1rem;color:var(--red);font-weight:900;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.admin-tabs{display:flex;gap:0;border-bottom:2px solid #EDD8C0;margin-bottom:16px;}
+.admin-tab{flex:1;padding:9px 4px;font-size:.82rem;font-weight:700;color:#999;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all .2s;}
+.admin-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.admin-panel{display:none;}
+.admin-panel.active{display:block;}
+
+/* 設定區塊 */
+.setting-section{background:var(--warm);border-radius:12px;padding:14px;margin-bottom:14px;}
+.setting-section h3{font-size:.88rem;font-weight:900;color:var(--red);margin-bottom:8px;}
+.setting-section input,.setting-section textarea{font-family:'Noto Serif TC',serif;font-size:.82rem;padding:8px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;color:var(--text);width:100%;margin-bottom:6px;}
+.setting-section textarea{resize:vertical;height:60px;}
+.setting-section p{font-size:.72rem;color:#888;margin-top:4px;line-height:1.5;}
+.test-btn{margin-top:4px;padding:8px 16px;background:var(--red);color:white;border:none;border-radius:8px;font-family:'Noto Serif TC',serif;font-size:.82rem;cursor:pointer;}
+
+/* 菜單管理行 */
+.admin-sec{margin-bottom:20px;}
+.admin-sec h3{font-size:.88rem;font-weight:700;color:var(--red);background:var(--warm);padding:6px 10px;border-radius:8px;margin-bottom:10px;}
+.a-row{background:#fafafa;border:1px solid #EDD8C0;border-radius:10px;padding:10px;margin-bottom:8px;}
+.a-row-top{display:flex;gap:6px;align-items:center;margin-bottom:8px;}
+.a-row-top input{flex:1;font-family:'Noto Serif TC',serif;font-size:.85rem;padding:6px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;}
+.a-price{width:80px;flex:none!important;}
+.a-row-bottom{display:flex;gap:6px;flex-direction:column;}
+.a-row-bottom input[type="text"]{font-family:'Noto Serif TC',serif;font-size:.82rem;padding:6px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;width:100%;}
+.a-img-row{display:flex;align-items:center;gap:8px;}
+.a-img-preview{width:48px;height:48px;object-fit:cover;border-radius:8px;border:1.5px solid #EDD8C0;display:none;}
+.a-img-label{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--warm);border:1.5px dashed #E8B86D;border-radius:8px;cursor:pointer;font-size:.78rem;color:var(--red);font-weight:700;}
+.a-img-label input[type="file"]{display:none;}
+.del-btn{background:#fee;border:1px solid #fcc;color:#c33;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:.78rem;white-space:nowrap;flex-shrink:0;}
+.add-btn{background:var(--warm);border:1.5px dashed var(--red);color:var(--red);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.82rem;font-weight:700;width:100%;margin-top:4px;}
+
+/* 活動區塊管理 */
+.event-admin-row{background:#FFF8F0;border:1.5px solid #FDEBD0;border-radius:10px;padding:12px;margin-bottom:10px;}
+.event-admin-row input,.event-admin-row textarea{font-family:'Noto Serif TC',serif;font-size:.83rem;padding:7px 10px;border:1.5px solid #FDEBD0;border-radius:8px;background:white;color:var(--text);width:100%;margin-bottom:6px;}
+.event-admin-row textarea{resize:none;height:56px;}
+.event-admin-row label{font-size:.76rem;color:#E67E22;font-weight:700;display:block;margin-bottom:3px;}
+
+.save-btn{background:var(--red);color:white;border:none;border-radius:10px;padding:12px;width:100%;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:10px;}
+.reset-btn2{background:#fff0f0;border:1px solid #fcc;color:#c33;border-radius:8px;padding:8px;width:100%;font-size:.82rem;cursor:pointer;margin-top:6px;font-family:'Noto Serif TC',serif;}
+.admin-note{font-size:.72rem;color:#bbb;margin-top:8px;text-align:center;}
+
+.empty-cart{text-align:center;padding:30px 0;color:#bbb;font-size:.9rem;}
+.spacer{height:80px;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -153,8 +199,8 @@
       </div>
     </div>
     <div class="field-group">
-      <label class="field-label">📝 備註(手機末三碼)</label>
-      <textarea id="orderNote" placeholder="例如：不加辣、少糖、袋裝…"></textarea>
+      <label class="field-label">📝 備註(請填手機末三碼)</label>
+      <textarea id="orderNote" placeholder="例如：加辣、加起司、迷你吐司做大份…"></textarea>
     </div>
     <div class="divider">
       <span>總計</span>
@@ -171,233 +217,321 @@
     <div class="s-icon">🎉</div>
     <div class="s-label">您的訂單編號</div>
     <div class="s-num" id="sNum">010</div>
-    <div class="s-title" id="sTitle">訂單明細</div>
+    <div class="s-title">訂單已送出！</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
-      <span class="spinner"></span> 正在傳送到店家 LINE…
+      <span class="spinner"></span> 正在傳送訂單…
     </div>
-    <button class="done-btn" onclick="closeDone()"> 截圖後，請點我</button>
+    <button class="done-btn" onclick="closeDone()">✓ 完成</button>
   </div>
 </div>
 
 <!-- 管理員面板 -->
 <div class="admin-wrap" id="adminWrap">
   <div class="admin-box">
-    <h2>⚙️ 菜單管理 <button class="x-btn" onclick="closeAdmin()">✕</button></h2>
+    <h2>⚙️ 後台管理 <button class="x-btn" onclick="closeAdmin()">✕</button></h2>
 
-    <!-- Webhook 設定 -->
-    <div class="webhook-section">
-      <h3>🔗 LINE 自動通知設定</h3>
-      <input type="text" id="webhookUrl" placeholder="請先在下方輸入框貼上您的 GAS Webhook 網址" oninput="saveWebhook(https://script.google.com/macros/s/AKfycby7_dpsIWfKMIB8fy3D_Z-llBrXLLPpEpdynajtgBgr-Za5-j5-Ij2rhVlMx_adyFeIiQ/exec)">
-      <p>請先完成設定步驟，取得 GAS 網址後貼上此處。<br>設定完成後每筆訂單將自動傳送到你的 LINE。</p>
-      <button class="test-btn" onclick="testWebhook()">🔔 測試傳送</button>
+    <!-- 管理員頁籤 -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('settings',this)">🔧 系統設定</button>
+      <button class="admin-tab" onclick="switchAdminTab('menu',this)">🍞 菜單管理</button>
+      <button class="admin-tab" onclick="switchAdminTab('event',this)">🎉 活動管理</button>
     </div>
 
-    <div id="adminContent"></div>
-    <button class="save-btn" onclick="saveAdmin()">💾 儲存並更新菜單</button>
-    <button class="reset-btn2" onclick="resetMenu()">🔄 恢復預設菜單</button>
+    <!-- 系統設定 -->
+    <div class="admin-panel active" id="panel-settings">
+      <div class="setting-section">
+        <h3>🔗 LINE 自動通知（GAS 網址）</h3>
+        <input type="text" id="webhookUrl" placeholder="貼上 Google Apps Script 網址" oninput="saveWebhook()">
+        <p>設定後每筆訂單自動傳送到店家與客人的 LINE。</p>
+        <button class="test-btn" onclick="testWebhook()">🔔 測試傳送</button>
+      </div>
+      <div class="setting-section">
+        <h3>🪪 LIFF ID</h3>
+        <input type="text" id="liffIdInput" placeholder="格式：1234567890-AbCdEfGh" oninput="saveLiffId()">
+        <p>從 LINE Developers → Channel → LIFF 頁籤取得。</p>
+      </div>
+    </div>
+
+    <!-- 菜單管理 -->
+    <div class="admin-panel" id="panel-menu">
+      <div id="adminMenuContent"></div>
+      <button class="save-btn" onclick="saveAdmin()">💾 儲存並更新菜單</button>
+      <button class="reset-btn2" onclick="resetMenu()">🔄 恢復預設菜單</button>
+    </div>
+
+    <!-- 活動管理 -->
+    <div class="admin-panel" id="panel-event">
+      <div class="setting-section" style="background:#FFF8F0;border:1px solid #FDEBD0;">
+        <h3 style="color:#E67E22;">🎉 期間限定活動設定</h3>
+        <p style="margin-bottom:10px;">開啟後會在菜單出現「活動專區」頁籤，顯示你設定的內容。</p>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:10px;">
+          <input type="checkbox" id="eventEnabled" onchange="saveEventEnabled()" style="width:18px;height:18px;"> 開啟活動專區
+        </label>
+        <input type="text" id="eventTitle" placeholder="活動名稱（例如：夏日特餐、週年慶優惠）" oninput="saveEventMeta()" style="font-family:'Noto Serif TC',serif;font-size:.85rem;padding:8px 10px;border:1.5px solid #FDEBD0;border-radius:8px;background:white;width:100%;margin-bottom:6px;">
+        <input type="text" id="eventPeriod" placeholder="活動期間（例如：7/1–7/31）" oninput="saveEventMeta()" style="font-family:'Noto Serif TC',serif;font-size:.85rem;padding:8px 10px;border:1.5px solid #FDEBD0;border-radius:8px;background:white;width:100%;">
+      </div>
+
+      <div id="eventItemsList"></div>
+      <button class="add-btn" style="border-color:#E67E22;color:#E67E22;background:#FFF8F0;" onclick="addEventItem()">＋ 新增活動品項</button>
+      <button class="save-btn" style="background:#E67E22;margin-top:10px;" onclick="saveEventItems()">💾 儲存活動內容</button>
+    </div>
+
     <p class="admin-note">點 LOGO 5下可開啟此面板</p>
   </div>
 </div>
 
 <script>
 // ══════════════════════════════════════════
-//  預設菜單
+//  LIFF 初始化
 // ══════════════════════════════════════════
-// 2. LIFF 初始化設定
-const MY_LIFF_ID = '2009741658-E1Z86q0b'; // 請替換成你在 LINE Developers 取得的 ID
+let lineUserId = null;
+let lineDisplayName = null;
 
 async function initLiff() {
+  const liffId = getLiffId();
+  if (!liffId) return;
   try {
-    await liff.init({ liffId: MY_LIFF_ID });
-    if (!liff.isLoggedIn()) {
-      liff.login();
-    } else {
-      // 登入成功後，可以順便抓取使用者名稱顯示在 Logo 旁
-      const profile = await liff.getProfile();
-      document.querySelector('header p').innerText = `你好 ${profile.displayName}，準備好點餐了嗎？`;
-    }
-  } catch (error) {
-    console.error('LIFF 初始化失敗', error);
-  }
+    await liff.init({ liffId });
+    if (liff.isInClient() && !liff.isLoggedIn()) { liff.login(); return; }
+    const profile = await liff.getProfile();
+    lineUserId = profile.userId;
+    lineDisplayName = profile.displayName;
+  } catch(e) { console.log('LIFF skip:', e.message); }
 }
+
+// ══════════════════════════════════════════
+//  訂單編號：全域累計，每日從010重置
+//  使用 localStorage 的共用 key（不分用戶）
+// ══════════════════════════════════════════
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+function nextNum() {
+  const today = todayKey();
+  // 用固定 key，所有用戶共用同一個計數器
+  let day = localStorage.getItem('gd_global_day') || '';
+  let cnt = parseInt(localStorage.getItem('gd_global_cnt') || '9');
+  if (day !== today) { day = today; cnt = 9; }
+  cnt++;
+  localStorage.setItem('gd_global_day', day);
+  localStorage.setItem('gd_global_cnt', String(cnt));
+  return String(cnt).padStart(3, '0');
+}
+
+// ══════════════════════════════════════════
+//  預設菜單（含圖片與備用欄位）
+// ══════════════════════════════════════════
 const DEFAULT = {
   toast:{ label:'🍞 吐司類', items:[
-    {id:'T1',name:'蛋吐司',price:30},
-    {id:'T2',name:'起司吐司',price:30},
-    {id:'T3',name:'火腿吐司',price:30},
-    {id:'T4',name:'肉蛋吐司',price:60},
-    {id:'T5',name:'加蛋',price:10}
+    {id:'T1', name:'蛋吐司',   price:30, img:'', extra:''},
+    {id:'T2', name:'起司吐司', price:30, img:'', extra:''},
+    {id:'T3', name:'火腿吐司', price:30, img:'', extra:''},
+    {id:'T4', name:'肉蛋吐司', price:60, img:'', extra:''},
+    {id:'T5', name:'加蛋', price:10, img:'', extra:''}
+    {id:'T6', name:'加起司', price:10, img:'', extra:''}
+    {id:'T7', name:'加火腿', price:10, img:'', extra:''}
   ]},
   crepe:{ label:'🥚 粉漿蛋餅', items:[
-    {id:'C1',name:'原味蛋餅',price:30},
-    {id:'C2',name:'起司蛋餅',price:40},
-    {id:'C3',name:'火腿蛋餅',price:40},
-    {id:'C4',name:'豬排蛋餅',price:55},
+    {id:'C1', name:'原味蛋餅', price:30, img:'', extra:''},
+    {id:'C2', name:'起司蛋餅', price:40, img:'', extra:''},
+    {id:'C3', name:'火腿蛋餅', price:40, img:'', extra:''},
+    {id:'C4', name:'豬排蛋餅', price:55, img:'', extra:''},
   ]},
   mini:{ label:'✨ 迷你吐司', items:[
-    {id:'M1',name:'花生吐司',price:10},
-    {id:'M2',name:'草莓吐司',price:10},
-    {id:'M3',name:'香蒜吐司',price:10},
-    {id:'M4',name:'巧克力吐司',price:10},
+    {id:'M1', name:'花生吐司',   price:10, img:'', extra:''},
+    {id:'M2', name:'草莓吐司',   price:10, img:'', extra:''},
+    {id:'M3', name:'香蒜吐司',   price:10, img:'', extra:''},
+    {id:'M4', name:'巧克力吐司', price:10, img:'', extra:''},
   ]},
   drink:{ label:'🧋 飲料', items:[
-    {id:'D1',name:'紅茶(甜度固定)',price:15},
-    {id:'D2',name:'奶茶(甜度固定)',price:25},
+    {id:'D1', name:'紅茶(甜度、涼度固定)', price:15, img:'', extra:''},
+    {id:'D2', name:'奶茶(甜度、涼度固定)', price:25, img:'', extra:''},
   ]},
 };
 
 // ══════════════════════════════════════════
-//  訂單編號：3碼，每日從010重置
+//  資料讀寫
 // ══════════════════════════════════════════
-function todayKey(){
-  const d=new Date();
-  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-}
-function nextNum(){
-  const today=todayKey();
-  let day=localStorage.getItem('gd_day')||'';
-  let cnt=parseInt(localStorage.getItem('gd_cnt')||'9');
-  if(day!==today){day=today;cnt=9;}
-  cnt++;
-  localStorage.setItem('gd_day',day);
-  localStorage.setItem('gd_cnt',String(cnt));
-  return String(cnt).padStart(3,'0');
-}
+function cp(o){ return JSON.parse(JSON.stringify(o)); }
+let MENU = (() => { try { const s = localStorage.getItem('gd_menu'); return s ? JSON.parse(s) : cp(DEFAULT); } catch(e){ return cp(DEFAULT); }})();
 
-// ══════════════════════════════════════════
-//  菜單資料
-// ══════════════════════════════════════════
-function cp(o){return JSON.parse(JSON.stringify(o));}
-let MENU=(()=>{try{const s=localStorage.getItem('gd_menu');return s?JSON.parse(s):cp(DEFAULT);}catch(e){return cp(DEFAULT);}})();
-let qty={};
+// 活動資料
+let EVENT = (() => { try { const s = localStorage.getItem('gd_event'); return s ? JSON.parse(s) : {enabled:false, title:'', period:'', items:[]}; } catch(e){ return {enabled:false,title:'',period:'',items:[]}; }})();
 
-// ══════════════════════════════════════════
-//  Webhook（GAS 網址）
-// ══════════════════════════════════════════
-function getWebhook(){return localStorage.getItem('gd_webhook')||'';}
-function saveWebhook(){
-  const v=document.getElementById('webhookUrl').value.trim();
-  localStorage.setItem('gd_webhook',v);
-}
-async function sendToLine(msg){
-  const url=getWebhook();
-  if(!url) return 'no_webhook';
-  try{
-    const res=await fetch(url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:msg})
-    });
-    return res.ok?'ok':'error';
-  }catch(e){return 'error';}
-}
-async function testWebhook(){
-  const url=getWebhook();
-  if(!url){alert('https://script.google.com/macros/s/AKfycbwTUSSm2m1B9EbTK1dl8gTVwiUMTOXtXim_k_AcuUmUyo28NV6jTcypewgKuJWPNGoxaQ/exec');return;}
-  const btn=document.querySelector('.test-btn');
-  btn.textContent='傳送中…'; btn.disabled=true;
-  const r=await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！');
-  btn.textContent='🔔 測試傳送'; btn.disabled=false;
-  alert(r==='ok'?'✅ 測試成功！已傳送到你的 LINE':'❌ 傳送失敗，請確認 GAS 網址是否正確');
-}
+let qty = {};
+
+function getWebhook(){ return localStorage.getItem('gd_webhook') || ''; }
+function saveWebhook(){ localStorage.setItem('gd_webhook', document.getElementById('webhookUrl').value.trim()); }
+function getLiffId(){ return localStorage.getItem('gd_liff_id') || ''; }
+function saveLiffId(){ localStorage.setItem('gd_liff_id', document.getElementById('liffIdInput').value.trim()); }
 
 // ══════════════════════════════════════════
 //  渲染菜單
 // ══════════════════════════════════════════
-function renderMenu(){
-  const tabsEl=document.getElementById('tabs');
-  const secsEl=document.getElementById('menuSections');
-  tabsEl.innerHTML=''; secsEl.innerHTML='';
-  const newQty={};
-  Object.values(MENU).flatMap(c=>c.items).forEach(i=>{newQty[i.id]=qty[i.id]||0;});
-  qty=newQty;
-  let first=true;
-  Object.keys(MENU).forEach(cat=>{
-    const {label,items}=MENU[cat];
-    const btn=document.createElement('button');
-    btn.className='tab'+(first?' active':'');
-    btn.textContent=label;
-    btn.onclick=()=>switchTab(cat,btn);
+function renderMenu() {
+  const tabsEl = document.getElementById('tabs');
+  const secsEl = document.getElementById('menuSections');
+  tabsEl.innerHTML = ''; secsEl.innerHTML = '';
+
+  const newQty = {};
+  Object.values(MENU).flatMap(c => c.items).forEach(i => { newQty[i.id] = qty[i.id] || 0; });
+  qty = newQty;
+
+  let first = true;
+  Object.keys(MENU).forEach(cat => {
+    const { label, items } = MENU[cat];
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (first ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => switchTab(cat, btn);
     tabsEl.appendChild(btn);
-    const sec=document.createElement('div');
-    sec.className='section'+(first?' visible':'');
-    sec.id='sec-'+cat;
-    sec.innerHTML=`<div class="section-title">${label}</div><div class="items" id="grid-${cat}"></div>`;
+
+    const sec = document.createElement('div');
+    sec.className = 'section' + (first ? ' visible' : '');
+    sec.id = 'sec-' + cat;
+    sec.innerHTML = `<div class="section-title">${label}</div><div class="items" id="grid-${cat}"></div>`;
     secsEl.appendChild(sec);
-    items.forEach(item=>{
-      const card=document.createElement('div');
-      card.className='item'; card.id='card-'+item.id;
-      card.innerHTML=`
-        <div class="item-name">${item.name}</div>
-        <div class="item-price">$${item.price}</div>
-        <div class="item-controls">
-          <button class="qty-btn" onclick="addQty('${item.id}',-1,event)">−</button>
-          <span class="qty-display" id="qd-${item.id}">${qty[item.id]||0}</span>
-          <button class="qty-btn" onclick="addQty('${item.id}',1,event)">＋</button>
+
+    items.forEach(item => {
+      qty[item.id] = qty[item.id] || 0;
+      const card = document.createElement('div');
+      card.className = 'item';
+      card.id = 'card-' + item.id;
+      // 圖片（若有）
+      const imgHtml = item.img
+        ? `<img class="item-img" src="${item.img}" alt="${item.name}">`
+        : '';
+      // 備用欄位（若有）
+      const extraHtml = item.extra
+        ? `<div class="item-extra">${item.extra}</div>`
+        : '';
+      card.innerHTML = `
+        ${imgHtml}
+        <div class="item-body">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">$${item.price}</div>
+          ${extraHtml}
+          <div class="item-controls">
+            <button class="qty-btn" onclick="addQty('${item.id}',-1,event)">−</button>
+            <span class="qty-display" id="qd-${item.id}">${qty[item.id]}</span>
+            <button class="qty-btn" onclick="addQty('${item.id}',1,event)">＋</button>
+          </div>
         </div>`;
-      document.getElementById('grid-'+cat).appendChild(card);
+      document.getElementById('grid-' + cat).appendChild(card);
     });
-    first=false;
+    first = false;
   });
+
+  // 活動頁籤（若開啟）
+  renderEventTab();
   updateBar();
 }
-function switchTab(cat,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('sec-'+cat).classList.add('visible');
+
+function renderEventTab() {
+  // 移除舊的活動頁籤和區塊
+  const oldTab = document.getElementById('event-tab-btn');
+  const oldSec = document.getElementById('sec-event');
+  if (oldTab) oldTab.remove();
+  if (oldSec) oldSec.remove();
+
+  if (!EVENT.enabled) return;
+
+  const tabsEl = document.getElementById('tabs');
+  const secsEl = document.getElementById('menuSections');
+
+  const btn = document.createElement('button');
+  btn.className = 'tab event-tab';
+  btn.id = 'event-tab-btn';
+  btn.textContent = `🎉 ${EVENT.title || '活動專區'}`;
+  btn.onclick = () => switchTab('event', btn);
+  tabsEl.appendChild(btn);
+
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  sec.id = 'sec-event';
+
+  let titleHtml = `<div class="section-title event-title">🎉 ${EVENT.title || '活動專區'}`;
+  if (EVENT.period) titleHtml += ` <span style="font-size:.7rem;font-weight:400;color:#E67E22;"> ${EVENT.period}</span>`;
+  titleHtml += `</div>`;
+
+  const itemsHtml = (EVENT.items || []).filter(i => i.f1 || i.f2 || i.f3 || i.f4).map(item => `
+    <div class="event-item">
+      <div class="event-badge">期間限定</div>
+      ${item.f1 ? `<div class="event-field"><b>${item.f1}</b></div>` : ''}
+      ${item.f2 ? `<div class="event-field">${item.f2}</div>` : ''}
+      ${item.f3 ? `<div class="event-field">${item.f3}</div>` : ''}
+      ${item.f4 ? `<div class="event-field">${item.f4}</div>` : ''}
+    </div>`).join('');
+
+  sec.innerHTML = titleHtml + `<div class="event-items">${itemsHtml || '<div class="empty-cart">尚無活動品項</div>'}</div>`;
+  secsEl.appendChild(sec);
+}
+
+function switchTab(cat, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + cat).classList.add('visible');
   btn.classList.add('active');
 }
-function addQty(id,delta,e){
-  if(e) e.stopPropagation();
-  qty[id]=Math.max(0,(qty[id]||0)+delta);
-  const el=document.getElementById('qd-'+id);
-  if(el) el.textContent=qty[id];
+
+function addQty(id, delta, e) {
+  if (e) e.stopPropagation();
+  qty[id] = Math.max(0, (qty[id] || 0) + delta);
+  const el = document.getElementById('qd-' + id);
+  if (el) el.textContent = qty[id];
   updateBar();
 }
-function allItems(){return Object.values(MENU).flatMap(c=>c.items);}
-function getCart(){return allItems().filter(i=>(qty[i.id]||0)>0).map(i=>({...i,q:qty[i.id],sub:i.price*qty[i.id]}));}
-function totalItems(){return Object.values(qty).reduce((a,b)=>a+b,0);}
-function totalPrice(){return getCart().reduce((a,b)=>a+b.sub,0);}
-function updateBar(){
-  const n=totalItems();
-  document.getElementById('cartCount').textContent=n;
-  document.getElementById('cartBarTotal').textContent='$'+totalPrice();
-  document.getElementById('cartBar').classList.toggle('visible',n>0);
+
+function allItems(){ return Object.values(MENU).flatMap(c => c.items); }
+function getCart(){ return allItems().filter(i => (qty[i.id]||0) > 0).map(i => ({...i, q:qty[i.id], sub:i.price*qty[i.id]})); }
+function totalItems(){ return Object.values(qty).reduce((a,b) => a+b, 0); }
+function totalPrice(){ return getCart().reduce((a,b) => a+b.sub, 0); }
+function updateBar() {
+  const n = totalItems();
+  document.getElementById('cartCount').textContent = n;
+  document.getElementById('cartBarTotal').textContent = '$' + totalPrice();
+  document.getElementById('cartBar').classList.toggle('visible', n > 0);
 }
 
 // ══════════════════════════════════════════
 //  取餐時間
 // ══════════════════════════════════════════
-function initTime(){
-  const d=new Date();
-  const p=n=>String(n).padStart(2,'0');
-  const today=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
-  const el=document.getElementById('pickupDate');
-  el.value=today; el.min=today;
-  const hEl=document.getElementById('pickupHour');
-  for(let h=6;h<=10;h++){const o=document.createElement('option');o.value=h;o.textContent=`${h} 點`;hEl.appendChild(o);}
-  hEl.value=7; updateMins();
+function initTime() {
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  const today = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const el = document.getElementById('pickupDate');
+  el.value = today; el.min = today;
+  const hEl = document.getElementById('pickupHour');
+  for (let h=6; h<=10; h++) { const o=document.createElement('option'); o.value=h; o.textContent=`${h} 點`; hEl.appendChild(o); }
+  hEl.value = 7; updateMins();
 }
-function updateMins(){
-  const h=parseInt(document.getElementById('pickupHour').value);
-  const mEl=document.getElementById('pickupMin'); mEl.innerHTML='';
-  const s=(h===6?10:0),e=(h===10?0:50);
-  for(let m=s;m<=e;m+=10){const o=document.createElement('option');o.value=m;o.textContent=String(m).padStart(2,'0')+' 分';mEl.appendChild(o);}
+function updateMins() {
+  const h = parseInt(document.getElementById('pickupHour').value);
+  const mEl = document.getElementById('pickupMin'); mEl.innerHTML = '';
+  const s = (h===6?10:0), e = (h===10?0:50);
+  for (let m=s; m<=e; m+=10) { const o=document.createElement('option'); o.value=m; o.textContent=String(m).padStart(2,'0')+' 分'; mEl.appendChild(o); }
 }
 
 // ══════════════════════════════════════════
 //  購物車
 // ══════════════════════════════════════════
-function openCart(){renderCartRows();document.getElementById('cartOverlay').classList.add('open');}
-function closeCart(){document.getElementById('cartOverlay').classList.remove('open');}
-function renderCartRows(){
-  const cart=getCart();
-  const el=document.getElementById('cartRows');
-  el.innerHTML=cart.length===0
-    ?'<div class="empty-cart">購物車是空的</div>'
-    :cart.map(i=>`<div class="cart-row">
-        <div class="cart-row-info"><div class="cart-row-name">${i.name}</div><div class="cart-row-sub">$${i.price} 元／份</div></div>
+function openCart(){ renderCartRows(); document.getElementById('cartOverlay').classList.add('open'); }
+function closeCart(){ document.getElementById('cartOverlay').classList.remove('open'); }
+
+function renderCartRows() {
+  const cart = getCart();
+  const el = document.getElementById('cartRows');
+  el.innerHTML = cart.length === 0
+    ? '<div class="empty-cart">購物車是空的</div>'
+    : cart.map(i => `
+      <div class="cart-row">
+        <div class="cart-row-info">
+          <div class="cart-row-name">${i.name}</div>
+          <div class="cart-row-sub">$${i.price} 元／份</div>
+        </div>
         <div class="cart-row-controls">
           <button class="c-btn" onclick="cartChange('${i.id}',-1)">−</button>
           <span class="c-qty">${i.q}</span>
@@ -405,190 +539,326 @@ function renderCartRows(){
         </div>
         <div class="cart-row-price">$${i.sub}</div>
       </div>`).join('');
-  document.getElementById('cartTotal').textContent='$'+totalPrice();
+  document.getElementById('cartTotal').textContent = '$' + totalPrice();
 }
-function cartChange(id,delta){
-  qty[id]=Math.max(0,(qty[id]||0)+delta);
-  const el=document.getElementById('qd-'+id);if(el)el.textContent=qty[id];
-  updateBar();renderCartRows();
+
+function cartChange(id, delta) {
+  qty[id] = Math.max(0, (qty[id]||0) + delta);
+  const el = document.getElementById('qd-' + id); if (el) el.textContent = qty[id];
+  updateBar(); renderCartRows();
 }
-function clearCart(){
-  Object.keys(qty).forEach(k=>qty[k]=0);
-  document.querySelectorAll('.qty-display').forEach(el=>el.textContent=0);
-  updateBar();closeCart();
+
+function clearCart() {
+  Object.keys(qty).forEach(k => qty[k] = 0);
+  document.querySelectorAll('.qty-display').forEach(el => el.textContent = 0);
+  updateBar(); closeCart();
 }
 
 // ══════════════════════════════════════════
 //  送出訂單
 // ══════════════════════════════════════════
-async function submitOrder(){
-  const cart=getCart();
-  if(!cart.length){alert('請先選擇商品！');return;}
-  const date=document.getElementById('pickupDate').value;
-  const hour=document.getElementById('pickupHour').value;
-  const min=document.getElementById('pickupMin').value;
-  const note=document.getElementById('orderNote').value.trim();
-  if(!date){alert('請選擇取餐日期！');return;}
+async function submitOrder() {
+  const cart = getCart();
+  if (!cart.length) { alert('請先選擇商品！'); return; }
+  const date = document.getElementById('pickupDate').value;
+  const hour = document.getElementById('pickupHour').value;
+  const min  = document.getElementById('pickupMin').value;
+  const note = document.getElementById('orderNote').value.trim();
+  if (!date) { alert('請選擇取餐日期！'); return; }
 
-  const time=`${date} ${hour}:${String(min).padStart(2,'0')}`;
-  const num=nextNum();
-  const total=totalPrice();
+  const time  = `${date} ${hour}:${String(min).padStart(2,'0')}`;
+  const num   = nextNum();   // ← 全域累計訂單編號
+  const total = totalPrice();
+  const customerName = lineDisplayName ? `👤 ${lineDisplayName}\n` : '';
 
-
-  // 組成 LINE 訊息
-  const lineMsg=
-    `━━━━━━━━━━━━━━━━━━\n`+
-    `🍞 GOOD DAY 新訂單\n`+
-    `━━━━━━━━━━━━━━━━━━\n`+
-    `📋 訂單編號：#${num}\n`+
-    `⏰ 取餐時間：${time}\n`+
-    `──────────────────\n`+
-    cart.map(i=>`  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n')+
-    `\n──────────────────\n`+
-    `💰 合計：$${total}`+
-    (note?`\n📝 備註(手機末三碼)：${note}`:'')+
+  const ownerMsg =
+    `━━━━━━━━━━━━━━━━━━\n🍞 GOOD DAY 新訂單\n━━━━━━━━━━━━━━━━━━\n` +
+    `📋 訂單編號：#${num}\n${customerName}⏰ 取餐時間：${time}\n──────────────────\n` +
+    cart.map(i => `  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n') +
+    `\n──────────────────\n💰 合計：$${total}` +
+    (note ? `\n📝 備註(請填手機末三碼)：${note}` : '') +
     `\n━━━━━━━━━━━━━━━━━━`;
 
-  // 顯示訂單明細
-  document.getElementById('sNum').textContent=num;
-  document.getElementById('sTitle').textContent='訂單明細';
-  document.getElementById('sDetail').innerHTML=
-    `<b>訂單 #${num}</b>　⏰ ${time}<br>`+
-    `${'─'.repeat(18)}<br>`+
-    cart.map(i=>`${i.name} ×${i.q}　$${i.sub}`).join('<br>')+
-    `<br>${'─'.repeat(18)}<br><b>合計：$${total}</b>`+
-    (note?`<br>備註(手機末三碼)：${note}`:'');
+  const confirmMsg =
+    `✅ 訂單已收到！\n\n📋 訂單 #${num}\n⏰ 取餐：${time}\n──────────────\n` +
+    cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('\n') +
+    `\n──────────────\n💰 合計：$${total}` +
+    (note ? `\n📝 備註(請填手機末三碼)：${note}` : '') +
+    `\n\n請準時取餐，謝謝！🙏`;
 
-  // 設定傳送狀態
-  const statusEl=document.getElementById('sendStatus');
-  statusEl.className='send-status sending';
-  statusEl.innerHTML='<span class="spinner"></span> 正在傳送到店家 LINE…';
+  document.getElementById('sNum').textContent = num;
+  document.getElementById('sDetail').innerHTML =
+    `<b>訂單 #${num}</b>　⏰ ${time}<br>${'─'.repeat(18)}<br>` +
+    cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('<br>') +
+    `<br>${'─'.repeat(18)}<br><b>合計：$${total}</b>` +
+    (note ? `<br>備註(請填手機末三碼)：${note}` : '');
 
-  // 鎖定按鈕防止重複送出
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> 傳送中…';
+  const statusEl = document.getElementById('sendStatus');
+  statusEl.className = 'send-status sending';
+  statusEl.innerHTML = '<span class="spinner"></span> 正在傳送訂單…';
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 傳送中…';
 
   closeCart();
   document.getElementById('successWrap').classList.add('open');
   clearCart();
-  document.getElementById('orderNote').value='';
+  document.getElementById('orderNote').value = '';
 
-  // 傳送到 LINE
-  if(!getWebhook()){
-    statusEl.className='send-status failed';
-    statusEl.innerHTML='⚠️ 尚未設定 GAS 網址，請到管理面板設定';
+  if (!getWebhook()) {
+    statusEl.className = 'send-status failed';
+    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，請到管理面板設定';
   } else {
-    const result=await sendToLine(lineMsg);
-    if(result==='ok'){
-      statusEl.className='send-status success';
-      statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
-    } else {
-      statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 訂單截圖並回傳官方LINE，才會出餐';
-    }
+    const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
+    statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
+    statusEl.innerHTML = result === 'ok'
+      ? '✅ 訂單已傳送！LINE 對話將出現確認訊息'
+      : '❌ 傳送失敗，請將訂單截圖傳給我們';
   }
-
-  btn.disabled=false; btn.innerHTML='送出訂單';
-
- // --- 原本的傳送到 Webhook 邏輯保留 ---
-  if(!getWebhook()){
-    statusEl.className='send-status failed';
-    statusEl.innerHTML='⚠️ 訂單截圖並回傳官方LINE，才會出餐';
-  } else {
-    const result = await sendToLine(lineMsg);
-    
-    // --- 3. 新增：直接透過 LIFF 發送訊息給使用者自己 ---
-    if (liff.isInClient()) {
-      await liff.sendMessages([{
-        type: 'text',
-        text: lineMsg // 直接把剛才組好的訂單文字發出去
-      }]).catch(err => console.error("傳送失敗", err));
-    }
-
-    if(result === 'ok'){
-      statusEl.className='send-status success';
-      statusEl.innerHTML='✅ 已自動傳送到店家 LINE！';
-    } else {
-      statusEl.className='send-status failed';
-      statusEl.innerHTML='✅ 訂單截圖並回傳官方LINE，才會出餐';
-    }
-  } 
+  btn.disabled = false; btn.innerHTML = '送出訂單';
 }
 
-function closeDone(){document.getElementById('successWrap').classList.remove('open');}
-
-// ══════════════════════════════════════════
-//  隱藏管理入口：點 LOGO 5下
-// ══════════════════════════════════════════
-let tapCount=0,tapTimer=null;
-function tapLogo(){
-  tapCount++;
-  clearTimeout(tapTimer);
-  tapTimer=setTimeout(()=>{tapCount=0;},2500);
-  if(tapCount>=5){tapCount=0;clearTimeout(tapTimer);openAdmin();}
+async function sendToLine(msg, userId, confirmMsg) {
+  const url = getWebhook();
+  if (!url) return 'no_webhook';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, userId: userId || null, confirmMessage: confirmMsg || null })
+    });
+    return res.ok ? 'ok' : 'error';
+  } catch(e) { return 'error'; }
 }
+
+async function testWebhook() {
+  const url = getWebhook();
+  if (!url) { alert('請先填入 GAS 網址！'); return; }
+  const btn = document.querySelector('.test-btn');
+  btn.textContent = '傳送中…'; btn.disabled = true;
+  const r = await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！', null, null);
+  btn.textContent = '🔔 測試傳送'; btn.disabled = false;
+  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '❌ 傳送失敗，請確認 GAS 網址');
+}
+
+function closeDone(){ document.getElementById('successWrap').classList.remove('open'); }
 
 // ══════════════════════════════════════════
 //  管理員面板
 // ══════════════════════════════════════════
-function openAdmin(){
-  document.getElementById('webhookUrl').value=getWebhook();
-  renderAdminPanel();
+let tapCount = 0, tapTimer = null;
+function tapLogo() {
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(() => { tapCount = 0; }, 2500);
+  if (tapCount >= 5) { tapCount = 0; clearTimeout(tapTimer); openAdmin(); }
+}
+
+function switchAdminTab(id, btn) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+}
+
+function openAdmin() {
+  document.getElementById('webhookUrl').value = getWebhook();
+  document.getElementById('liffIdInput').value = getLiffId();
+  renderAdminMenu();
+  renderEventAdmin();
   document.getElementById('adminWrap').classList.add('open');
 }
-function closeAdmin(){document.getElementById('adminWrap').classList.remove('open');}
-function renderAdminPanel(){
-  const el=document.getElementById('adminContent');
-  el.innerHTML='';
-  Object.keys(MENU).forEach(cat=>{
-    const {label,items}=MENU[cat];
-    const sec=document.createElement('div');
-    sec.className='admin-sec';
-    sec.innerHTML=`<h3>${label}</h3>`;
-    const list=document.createElement('div');
-    list.id='al-'+cat;
-    items.forEach(item=>list.appendChild(makeARow(cat,item)));
+function closeAdmin(){ document.getElementById('adminWrap').classList.remove('open'); }
+
+// ── 菜單管理 ──
+function renderAdminMenu() {
+  const el = document.getElementById('adminMenuContent');
+  el.innerHTML = '';
+  Object.keys(MENU).forEach(cat => {
+    const { label, items } = MENU[cat];
+    const sec = document.createElement('div');
+    sec.className = 'admin-sec';
+    sec.innerHTML = `<h3>${label}</h3>`;
+    const list = document.createElement('div');
+    list.id = 'al-' + cat;
+    items.forEach(item => list.appendChild(makeMenuRow(cat, item)));
     sec.appendChild(list);
-    const ab=document.createElement('button');
-    ab.className='add-btn'; ab.textContent='＋ 新增品項';
-    ab.onclick=()=>{
-      const ni={id:cat[0].toUpperCase()+Date.now(),name:'',price:0};
-      MENU[cat].items.push(ni);list.appendChild(makeARow(cat,ni));
+    const ab = document.createElement('button');
+    ab.className = 'add-btn'; ab.textContent = '＋ 新增品項';
+    ab.onclick = () => {
+      const ni = { id: cat[0].toUpperCase() + Date.now(), name:'', price:0, img:'', extra:'' };
+      MENU[cat].items.push(ni);
+      list.appendChild(makeMenuRow(cat, ni));
     };
-    sec.appendChild(ab);el.appendChild(sec);
+    sec.appendChild(ab);
+    el.appendChild(sec);
   });
 }
-function makeARow(cat,item){
-  const row=document.createElement('div');
-  row.className='a-row'; row.id='ar-'+item.id;
-  row.innerHTML=`
-    <input type="text" placeholder="品項名稱" value="${item.name}" oninput="updF('${cat}','${item.id}','name',this.value)">
-    <input type="number" class="a-price" placeholder="價格" value="${item.price}" oninput="updF('${cat}','${item.id}','price',this.value)">
+
+function makeMenuRow(cat, item) {
+  const row = document.createElement('div');
+  row.className = 'a-row';
+  row.id = 'ar-' + item.id;
+
+  // 頂部：品名 + 價格 + 刪除
+  const top = document.createElement('div');
+  top.className = 'a-row-top';
+  top.innerHTML = `
+    <input type="text" placeholder="品項名稱" value="${item.name}"
+      oninput="updF('${cat}','${item.id}','name',this.value)">
+    <input type="number" class="a-price" placeholder="價格" value="${item.price}"
+      oninput="updF('${cat}','${item.id}','price',this.value)">
     <button class="del-btn" onclick="delF('${cat}','${item.id}')">刪除</button>`;
+  row.appendChild(top);
+
+  // 底部：圖片上傳 + 備用欄位
+  const bottom = document.createElement('div');
+  bottom.className = 'a-row-bottom';
+
+  // 圖片上傳
+  const imgRow = document.createElement('div');
+  imgRow.className = 'a-img-row';
+
+  const preview = document.createElement('img');
+  preview.className = 'a-img-preview';
+  preview.id = 'prev-' + item.id;
+  if (item.img) { preview.src = item.img; preview.style.display = 'block'; }
+
+  const label = document.createElement('label');
+  label.className = 'a-img-label';
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.onchange = (e) => handleImgUpload(e, cat, item.id);
+  label.appendChild(fileInput);
+  label.innerHTML += '📷 上傳圖片';
+  label.prepend(fileInput);
+
+  // 清除圖片按鈕
+  const clearImg = document.createElement('button');
+  clearImg.textContent = '✕';
+  clearImg.style.cssText = 'border:none;background:#fee;color:#c33;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.78rem;';
+  clearImg.title = '移除圖片';
+  clearImg.onclick = () => {
+    updF(cat, item.id, 'img', '');
+    preview.src = ''; preview.style.display = 'none';
+  };
+
+  imgRow.appendChild(preview);
+  imgRow.appendChild(label);
+  imgRow.appendChild(clearImg);
+  bottom.appendChild(imgRow);
+
+  // 備用欄位
+  const extraInput = document.createElement('input');
+  extraInput.type = 'text';
+  extraInput.placeholder = '備用欄位（例如：過敏原、製作說明、活動資訊…）';
+  extraInput.value = item.extra || '';
+  extraInput.oninput = (e) => updF(cat, item.id, 'extra', e.target.value);
+  bottom.appendChild(extraInput);
+
+  row.appendChild(bottom);
   return row;
 }
-function updF(cat,id,f,v){const it=MENU[cat].items.find(i=>i.id===id);if(it)it[f]=f==='price'?(parseInt(v)||0):v;}
-function delF(cat,id){MENU[cat].items=MENU[cat].items.filter(i=>i.id!==id);const r=document.getElementById('ar-'+id);if(r)r.remove();}
-function saveAdmin(){localStorage.setItem('gd_menu',JSON.stringify(MENU));renderMenu();closeAdmin();alert('✅ 菜單已更新！');}
-function resetMenu(){if(!confirm('確定要恢復預設菜單？'))return;MENU=cp(DEFAULT);localStorage.removeItem('gd_menu');renderMenu();closeAdmin();alert('✅ 已恢復預設菜單');}
+
+function handleImgUpload(e, cat, id) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const base64 = ev.target.result;
+    updF(cat, id, 'img', base64);
+    const prev = document.getElementById('prev-' + id);
+    if (prev) { prev.src = base64; prev.style.display = 'block'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function updF(cat, id, f, v) {
+  const it = MENU[cat].items.find(i => i.id === id);
+  if (it) it[f] = f === 'price' ? (parseInt(v) || 0) : v;
+}
+function delF(cat, id) {
+  MENU[cat].items = MENU[cat].items.filter(i => i.id !== id);
+  const r = document.getElementById('ar-' + id); if (r) r.remove();
+}
+function saveAdmin() {
+  localStorage.setItem('gd_menu', JSON.stringify(MENU));
+  renderMenu(); closeAdmin(); alert('✅ 菜單已更新！');
+}
+function resetMenu() {
+  if (!confirm('確定要恢復預設菜單？')) return;
+  MENU = cp(DEFAULT); localStorage.removeItem('gd_menu');
+  renderMenu(); closeAdmin(); alert('✅ 已恢復預設菜單');
+}
+
+// ── 活動管理 ──
+function saveEventEnabled() {
+  EVENT.enabled = document.getElementById('eventEnabled').checked;
+  localStorage.setItem('gd_event', JSON.stringify(EVENT));
+  renderEventTab();
+}
+function saveEventMeta() {
+  EVENT.title  = document.getElementById('eventTitle').value.trim();
+  EVENT.period = document.getElementById('eventPeriod').value.trim();
+  localStorage.setItem('gd_event', JSON.stringify(EVENT));
+}
+
+function renderEventAdmin() {
+  document.getElementById('eventEnabled').checked = EVENT.enabled;
+  document.getElementById('eventTitle').value  = EVENT.title || '';
+  document.getElementById('eventPeriod').value = EVENT.period || '';
+  const list = document.getElementById('eventItemsList');
+  list.innerHTML = '';
+  (EVENT.items || []).forEach((item, idx) => list.appendChild(makeEventRow(item, idx)));
+}
+
+function makeEventRow(item, idx) {
+  const div = document.createElement('div');
+  div.className = 'event-admin-row';
+  div.id = 'erow-' + idx;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:.82rem;font-weight:700;color:#E67E22;">品項 ${idx+1}</span>
+      <button class="del-btn" onclick="delEventItem(${idx})">刪除</button>
+    </div>
+    <label>欄位一（品名／主標題）</label>
+    <input type="text" placeholder="例如：夏日特餐 $80" value="${item.f1||''}" oninput="updEvent(${idx},'f1',this.value)">
+    <label>欄位二（副說明）</label>
+    <input type="text" placeholder="例如：燻雞蛋沙拉三明治＋紅茶" value="${item.f2||''}" oninput="updEvent(${idx},'f2',this.value)">
+    <label>欄位三（備註／說明）</label>
+    <textarea placeholder="例如：限量10份，售完為止" oninput="updEvent(${idx},'f3',this.value)">${item.f3||''}</textarea>
+    <label>欄位四（自由填寫）</label>
+    <input type="text" placeholder="可填入任何補充資訊" value="${item.f4||''}" oninput="updEvent(${idx},'f4',this.value)">`;
+  return div;
+}
+
+function addEventItem() {
+  EVENT.items = EVENT.items || [];
+  EVENT.items.push({ f1:'', f2:'', f3:'', f4:'' });
+  const list = document.getElementById('eventItemsList');
+  const idx = EVENT.items.length - 1;
+  list.appendChild(makeEventRow(EVENT.items[idx], idx));
+}
+function updEvent(idx, field, val) {
+  if (EVENT.items[idx]) EVENT.items[idx][field] = val;
+}
+function delEventItem(idx) {
+  EVENT.items.splice(idx, 1);
+  renderEventAdmin();
+}
+function saveEventItems() {
+  localStorage.setItem('gd_event', JSON.stringify(EVENT));
+  renderEventTab();
+  alert('✅ 活動內容已儲存！');
+}
 
 // ══════════════════════════════════════════
 //  初始化
 // ══════════════════════════════════════════
 renderMenu();
 initTime();
-// 修改前：
-// renderMenu();
-// initTime();
-
-// 修改後：
-async function startApp() {
-  await initLiff(); // 先初始化 LINE
-  renderMenu();     // 再渲染網頁內容
-  initTime();
-}
-
-startApp();
+initLiff();
 </script>
 </body>
 </html>
