@@ -242,13 +242,13 @@ textarea{resize:none;height:68px;}
     <div class="admin-panel active" id="panel-settings">
       <div class="setting-section">
         <h3>🔗 LINE 自動通知（GAS 網址）</h3>
-        <input type="text" id="webhookUrl" placeholder="貼上 Google Apps Script 網址" oninput="saveWebhook(https://script.google.com/macros/s/AKfycbxVZjZZmZqwCUXG6QTTIwPGfE83tmijojVaPQQOaea8uimzDToQRXLREhziT6CdQVaguQ/exec)">
+        <input type="text" id="webhookUrl" placeholder="貼上 Google Apps Script 網址" oninput="saveWebhook()">
         <p>設定後每筆訂單自動傳送到店家與客人的 LINE。</p>
         <button class="test-btn" onclick="testWebhook()">🔔 測試傳送</button>
       </div>
       <div class="setting-section">
         <h3>🪪 LIFF ID</h3>
-        <input type="text" id="liffIdInput" placeholder="格式：1234567890-AbCdEfGh" oninput="saveLiffId(2009741658-E1Z86q0b)">
+        <input type="text" id="liffIdInput" placeholder="格式：1234567890-AbCdEfGh" oninput="saveLiffId()">
         <p>從 LINE Developers → Channel → LIFF 頁籤取得。</p>
       </div>
     </div>
@@ -613,7 +613,7 @@ async function submitOrder() {
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
     statusEl.innerHTML = result === 'ok'
       ? '✅ 訂單已傳送！LINE 對話將出現確認訊息'
-      : '❌ 傳送失敗，請將訂單截圖傳給我們';
+      : '⚠️ 訂單截圖傳給我們，才會出餐';
   }
   btn.disabled = false; btn.innerHTML = '送出訂單';
 }
@@ -638,7 +638,7 @@ async function testWebhook() {
   btn.textContent = '傳送中…'; btn.disabled = true;
   const r = await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！', null, null);
   btn.textContent = '🔔 測試傳送'; btn.disabled = false;
-  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '❌ 傳送失敗，請確認 GAS 網址');
+  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '⚠️ 訂單截圖傳給我們，才會出餐');
 }
 
 function closeDone(){ document.getElementById('successWrap').classList.remove('open'); }
