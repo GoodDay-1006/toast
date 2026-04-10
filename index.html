@@ -242,13 +242,13 @@ textarea{resize:none;height:68px;}
     <div class="admin-panel active" id="panel-settings">
       <div class="setting-section">
         <h3>🔗 LINE 自動通知（GAS 網址）</h3>
-        <input type="text" id="webhookUrl" placeholder="貼上 Google Apps Script 網址" oninput="saveWebhook()">
+        <input type="text" id="webhookUrl" placeholder="貼上 Google Apps Script 網址" oninput="saveWebhook(https://script.google.com/macros/s/AKfycbxVZjZZmZqwCUXG6QTTIwPGfE83tmijojVaPQQOaea8uimzDToQRXLREhziT6CdQVaguQ/exec)">
         <p>設定後每筆訂單自動傳送到店家與客人的 LINE。</p>
         <button class="test-btn" onclick="testWebhook()">🔔 測試傳送</button>
       </div>
       <div class="setting-section">
         <h3>🪪 LIFF ID</h3>
-        <input type="text" id="liffIdInput" placeholder="格式：1234567890-AbCdEfGh" oninput="saveLiffId()">
+        <input type="text" id="liffIdInput" placeholder="格式：1234567890-AbCdEfGh" oninput="saveLiffId(2009741658-E1Z86q0b)">
         <p>從 LINE Developers → Channel → LIFF 頁籤取得。</p>
       </div>
     </div>
