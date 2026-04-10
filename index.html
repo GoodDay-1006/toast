@@ -607,7 +607,7 @@ async function submitOrder() {
 
   if (!getWebhook()) {
     statusEl.className = 'send-status failed';
-    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，請到管理面板設定';
+    statusEl.innerHTML = '⚠️ 訂單截圖傳給我們，才會出餐';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
