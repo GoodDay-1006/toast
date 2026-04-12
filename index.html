@@ -174,7 +174,7 @@ textarea{resize:none;height:68px;}
 <!-- 購物車 bar -->
 <div class="cart-bar" id="cartBar" onclick="openCart()">
   <div class="cart-bar-inner">
-    <div>🛒 購物車 <span class="cart-count" id="cartCount">0</span></div>
+    <div>🛒 查看訂單 <span class="cart-count" id="cartCount">0</span></div>
     <div style="font-size:1.1rem;font-weight:700;" id="cartBarTotal">$0</div>
   </div>
 </div>
@@ -595,7 +595,7 @@ async function submitOrder() {
     `<b>訂單 #${num}</b>　⏰ ${time}<br>${'─'.repeat(18)}<br>` +
     cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('<br>') +
     `<br>${'─'.repeat(18)}<br><b>合計：$${total}</b>` +
-    (note ? `<br>備註：${note}` : '');
+    (note ? `<br>備註(請填手機末三碼)：${note}` : '');
 
   statusEl.innerHTML = '<span class="spinner"></span> 正在傳送訂單…';
 
@@ -604,7 +604,7 @@ async function submitOrder() {
     `📋 訂單編號：#${num}\n${customerName}⏰ 取餐時間：${time}\n──────────────────\n` +
     cart.map(i => `  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n') +
     `\n──────────────────\n💰 合計：$${total}` +
-    (note ? `\n📝 備註：${note}` : '') +
+    (note ? `\n📝 備註(請填手機末三碼)：${note}` : '') +
     `\n━━━━━━━━━━━━━━━━━━`;
 
   const confirmMsg =
@@ -619,7 +619,7 @@ async function submitOrder() {
 
   if (!getWebhook()) {
     statusEl.className = 'send-status failed';
-    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，請到管理面板設定';
+    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，訂單截圖回傳給我們，才會出餐';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
