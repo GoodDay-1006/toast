@@ -163,7 +163,7 @@ textarea{resize:none;height:68px;}
 
 <header>
   <h1 id="logoTap" onclick="tapLogo()">🍞 GOOD DAY</h1>
-  <p>Tea & Toast — 線上點餐</p>
+  <p>線上點餐</p>
   <div class="hours">週一至週六　AM 6:00 – 10:00</div>
 </header>
 
@@ -199,8 +199,8 @@ textarea{resize:none;height:68px;}
       </div>
     </div>
     <div class="field-group">
-      <label class="field-label">📝 備註</label>
-      <textarea id="orderNote" placeholder="例如：不加辣、少糖、袋裝…"></textarea>
+      <label class="field-label">📝 備註(手機末三碼)</label>
+      <textarea id="orderNote" placeholder="例如：加辣"></textarea>
     </div>
     <div class="divider">
       <span>總計</span>
@@ -217,7 +217,7 @@ textarea{resize:none;height:68px;}
     <div class="s-icon">🎉</div>
     <div class="s-label">您的訂單編號</div>
     <div class="s-num" id="sNum">010</div>
-    <div class="s-title">訂單已送出！</div>
+    <div class="s-title">訂單明細！</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
@@ -339,12 +339,17 @@ const DEFAULT = {
     {id:'T2', name:'起司吐司', price:30, img:'', extra:''},
     {id:'T3', name:'火腿吐司', price:30, img:'', extra:''},
     {id:'T4', name:'肉蛋吐司', price:60, img:'', extra:''},
+    {id:'T5', name:'加蛋', price:10, img:'', extra:''},
+    {id:'T6', name:'加火腿', price:10, img:'', extra:''},
+    {id:'T7', name:'加起司', price:10, img:'', extra:''},
   ]},
   crepe:{ label:'🥚 粉漿蛋餅', items:[
     {id:'C1', name:'原味蛋餅', price:30, img:'', extra:''},
     {id:'C2', name:'起司蛋餅', price:40, img:'', extra:''},
     {id:'C3', name:'火腿蛋餅', price:40, img:'', extra:''},
     {id:'C4', name:'豬排蛋餅', price:55, img:'', extra:''},
+    {id:'C5', name:'加火腿', price:10, img:'', extra:''},
+    {id:'C6', name:'加起司', price:10, img:'', extra:''},
   ]},
   mini:{ label:'✨ 迷你吐司', items:[
     {id:'M1', name:'花生吐司',   price:10, img:'', extra:''},
@@ -353,8 +358,8 @@ const DEFAULT = {
     {id:'M4', name:'巧克力吐司', price:10, img:'', extra:''},
   ]},
   drink:{ label:'🧋 飲料', items:[
-    {id:'D1', name:'紅茶', price:15, img:'', extra:''},
-    {id:'D2', name:'奶茶', price:25, img:'', extra:''},
+    {id:'D1', name:'紅茶(甜度、冰度固定)', price:15, img:'', extra:''},
+    {id:'D2', name:'奶茶(甜度、冰度固定)', price:25, img:'', extra:''},
   ]},
 };
 
@@ -619,7 +624,7 @@ async function submitOrder() {
 
   if (!getWebhook()) {
     statusEl.className = 'send-status failed';
-    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，訂單截圖回傳給我們，才會出餐';
+    statusEl.innerHTML = '⚠️ 訂單截圖回傳到官方LINE，才會出餐';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
