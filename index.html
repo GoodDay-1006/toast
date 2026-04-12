@@ -163,7 +163,7 @@ textarea{resize:none;height:68px;}
 
 <header>
   <h1 id="logoTap" onclick="tapLogo()">🍞 GOOD DAY</h1>
-  <p>線上點餐</p>
+  <p>Tea & Toast — 線上點餐</p>
   <div class="hours">週一至週六　AM 6:00 – 10:00</div>
 </header>
 
@@ -174,7 +174,7 @@ textarea{resize:none;height:68px;}
 <!-- 購物車 bar -->
 <div class="cart-bar" id="cartBar" onclick="openCart()">
   <div class="cart-bar-inner">
-    <div>🛒 查看訂單 <span class="cart-count" id="cartCount">0</span></div>
+    <div>🛒 購物車 <span class="cart-count" id="cartCount">0</span></div>
     <div style="font-size:1.1rem;font-weight:700;" id="cartBarTotal">$0</div>
   </div>
 </div>
@@ -199,8 +199,8 @@ textarea{resize:none;height:68px;}
       </div>
     </div>
     <div class="field-group">
-      <label class="field-label">📝 備註(請填手機末三碼)</label>
-      <textarea id="orderNote" placeholder="例如：加辣、加起司、迷你吐司做大份…"></textarea>
+      <label class="field-label">📝 備註</label>
+      <textarea id="orderNote" placeholder="例如：不加辣、少糖、袋裝…"></textarea>
     </div>
     <div class="divider">
       <span>總計</span>
@@ -222,7 +222,7 @@ textarea{resize:none;height:68px;}
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
     </div>
-    <button class="done-btn" onclick="closeDone()">✓ 完成</button>
+    <button class="done-btn" onclick="closeDone()">✓ 訂單已截圖</button>
   </div>
 </div>
 
@@ -301,23 +301,33 @@ async function initLiff() {
 }
 
 // ══════════════════════════════════════════
-//  訂單編號：全域累計，每日從010重置
-//  使用 localStorage 的共用 key（不分用戶）
+//  訂單編號：向 GAS 雲端取得（真正跨用戶共用）
+//  號碼存在 GAS PropertiesService，所有人共用
+//  每日台灣時間午夜自動歸零，從010重新開始
 // ══════════════════════════════════════════
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-}
-function nextNum() {
-  const today = todayKey();
-  // 用固定 key，所有用戶共用同一個計數器
-  let day = localStorage.getItem('gd_global_day') || '';
-  let cnt = parseInt(localStorage.getItem('gd_global_cnt') || '9');
-  if (day !== today) { day = today; cnt = 9; }
-  cnt++;
-  localStorage.setItem('gd_global_day', day);
-  localStorage.setItem('gd_global_cnt', String(cnt));
-  return String(cnt).padStart(3, '0');
+async function getCloudOrderNum() {
+  const url = getWebhook();
+  if (!url) {
+    // 未設定 GAS 時用本地暫代（僅供測試）
+    let cnt = parseInt(localStorage.getItem('gd_local_cnt') || '9') + 1;
+    localStorage.setItem('gd_local_cnt', String(cnt));
+    return String(cnt).padStart(3, '0');
+  }
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'getOrderNum' })
+    });
+    const data = await res.json();
+    if (data.status === 'ok' && data.orderNum) return data.orderNum;
+    throw new Error('no num');
+  } catch(e) {
+    // 網路失敗備用
+    let cnt = parseInt(localStorage.getItem('gd_local_cnt') || '9') + 1;
+    localStorage.setItem('gd_local_cnt', String(cnt));
+    return String(cnt).padStart(3, '0');
+  }
 }
 
 // ══════════════════════════════════════════
@@ -329,9 +339,6 @@ const DEFAULT = {
     {id:'T2', name:'起司吐司', price:30, img:'', extra:''},
     {id:'T3', name:'火腿吐司', price:30, img:'', extra:''},
     {id:'T4', name:'肉蛋吐司', price:60, img:'', extra:''},
-    {id:'T5', name:'加蛋', price:10, img:'', extra:''},
-    {id:'T6', name:'加起司', price:10, img:'', extra:''},
-    {id:'T7', name:'加火腿', price:10, img:'', extra:''}
   ]},
   crepe:{ label:'🥚 粉漿蛋餅', items:[
     {id:'C1', name:'原味蛋餅', price:30, img:'', extra:''},
@@ -346,8 +353,8 @@ const DEFAULT = {
     {id:'M4', name:'巧克力吐司', price:10, img:'', extra:''},
   ]},
   drink:{ label:'🧋 飲料', items:[
-    {id:'D1', name:'紅茶(甜度、涼度固定)', price:15, img:'', extra:''},
-    {id:'D2', name:'奶茶(甜度、涼度固定)', price:25, img:'', extra:''},
+    {id:'D1', name:'紅茶', price:15, img:'', extra:''},
+    {id:'D2', name:'奶茶', price:25, img:'', extra:''},
   ]},
 };
 
@@ -511,8 +518,8 @@ function initTime() {
 function updateMins() {
   const h = parseInt(document.getElementById('pickupHour').value);
   const mEl = document.getElementById('pickupMin'); mEl.innerHTML = '';
-  const s = (h===6?10:0), e = (h===10?0:50);
-  for (let m=s; m<=e; m+=10) { const o=document.createElement('option'); o.value=m; o.textContent=String(m).padStart(2,'0')+' 分'; mEl.appendChild(o); }
+  const s = (h===6?10:0), e = (h===10?0:55);
+  for (let m=s; m<=e; m+=5) { const o=document.createElement('option'); o.value=m; o.textContent=String(m).padStart(2,'0')+' 分'; mEl.appendChild(o); }
 }
 
 // ══════════════════════════════════════════
@@ -567,53 +574,58 @@ async function submitOrder() {
   if (!date) { alert('請選擇取餐日期！'); return; }
 
   const time  = `${date} ${hour}:${String(min).padStart(2,'0')}`;
-  const num   = nextNum();   // ← 全域累計訂單編號
   const total = totalPrice();
   const customerName = lineDisplayName ? `👤 ${lineDisplayName}\n` : '';
 
-  const ownerMsg =
-    `━━━━━━━━━━━━━━━━━━\n🍞 GOOD DAY 新訂單\n━━━━━━━━━━━━━━━━━━\n` +
-    `📋 訂單編號：#${num}\n${customerName}⏰ 取餐時間：${time}\n──────────────────\n` +
-    cart.map(i => `  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n') +
-    `\n──────────────────\n💰 合計：$${total}` +
-    (note ? `\n📝 備註(請填手機末三碼)：${note}` : '') +
-    `\n━━━━━━━━━━━━━━━━━━`;
+  // 鎖定按鈕，先向 GAS 雲端取得訂單號碼（跨用戶真正共用）
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 取得編號中…';
+  closeCart();
+  document.getElementById('successWrap').classList.add('open');
+  document.getElementById('sNum').textContent = '...';
+  const statusEl = document.getElementById('sendStatus');
+  statusEl.className = 'send-status sending';
+  statusEl.innerHTML = '<span class="spinner"></span> 正在取得訂單編號…';
 
-  const confirmMsg =
-    `✅ 訂單已收到！\n\n📋 訂單 #${num}\n⏰ 取餐：${time}\n──────────────\n` +
-    cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('\n') +
-    `\n──────────────\n💰 合計：$${total}` +
-    (note ? `\n📝 備註(請填手機末三碼)：${note}` : '') +
-    `\n\n請準時取餐，謝謝！🙏`;
+  // 向 GAS 取得號碼
+  const num = await getCloudOrderNum();
 
   document.getElementById('sNum').textContent = num;
   document.getElementById('sDetail').innerHTML =
     `<b>訂單 #${num}</b>　⏰ ${time}<br>${'─'.repeat(18)}<br>` +
     cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('<br>') +
     `<br>${'─'.repeat(18)}<br><b>合計：$${total}</b>` +
-    (note ? `<br>備註(請填手機末三碼)：${note}` : '');
+    (note ? `<br>備註：${note}` : '');
 
-  const statusEl = document.getElementById('sendStatus');
-  statusEl.className = 'send-status sending';
   statusEl.innerHTML = '<span class="spinner"></span> 正在傳送訂單…';
 
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 傳送中…';
+  const ownerMsg =
+    `━━━━━━━━━━━━━━━━━━\n🍞 GOOD DAY 新訂單\n━━━━━━━━━━━━━━━━━━\n` +
+    `📋 訂單編號：#${num}\n${customerName}⏰ 取餐時間：${time}\n──────────────────\n` +
+    cart.map(i => `  ${i.name} × ${i.q}  →  $${i.sub}`).join('\n') +
+    `\n──────────────────\n💰 合計：$${total}` +
+    (note ? `\n📝 備註：${note}` : '') +
+    `\n━━━━━━━━━━━━━━━━━━`;
 
-  closeCart();
-  document.getElementById('successWrap').classList.add('open');
+  const confirmMsg =
+    `✅ 訂單已收到！\n\n📋 訂單 #${num}\n⏰ 取餐：${time}\n──────────────\n` +
+    cart.map(i => `${i.name} ×${i.q}　$${i.sub}`).join('\n') +
+    `\n──────────────\n💰 合計：$${total}` +
+    (note ? `\n📝 備註：${note}` : '') +
+    `\n\n請準時取餐，謝謝！🙏`;
+
   clearCart();
   document.getElementById('orderNote').value = '';
 
   if (!getWebhook()) {
     statusEl.className = 'send-status failed';
-    statusEl.innerHTML = '⚠️ 訂單截圖傳給我們，才會出餐';
+    statusEl.innerHTML = '⚠️ 尚未設定 GAS 網址，請到管理面板設定';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
     statusEl.innerHTML = result === 'ok'
       ? '✅ 訂單已傳送！LINE 對話將出現確認訊息'
-      : '⚠️ 訂單截圖傳給我們，才會出餐';
+      : '❌ 傳送失敗，請截圖告知店家';
   }
   btn.disabled = false; btn.innerHTML = '送出訂單';
 }
@@ -638,7 +650,7 @@ async function testWebhook() {
   btn.textContent = '傳送中…'; btn.disabled = true;
   const r = await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！', null, null);
   btn.textContent = '🔔 測試傳送'; btn.disabled = false;
-  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '⚠️ 訂單截圖傳給我們，才會出餐');
+  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '❌ 傳送失敗，請確認 GAS 網址');
 }
 
 function closeDone(){ document.getElementById('successWrap').classList.remove('open'); }
@@ -700,64 +712,94 @@ function makeMenuRow(cat, item) {
   row.className = 'a-row';
   row.id = 'ar-' + item.id;
 
-  // 頂部：品名 + 價格 + 刪除
-  const top = document.createElement('div');
-  top.className = 'a-row-top';
-  top.innerHTML = `
-    <input type="text" placeholder="品項名稱" value="${item.name}"
-      oninput="updF('${cat}','${item.id}','name',this.value)">
-    <input type="number" class="a-price" placeholder="價格" value="${item.price}"
-      oninput="updF('${cat}','${item.id}','price',this.value)">
-    <button class="del-btn" onclick="delF('${cat}','${item.id}')">刪除</button>`;
-  row.appendChild(top);
+  // ── 第一行：品名 ──
+  const nameLabel = document.createElement('div');
+  nameLabel.style.cssText = 'font-size:.75rem;font-weight:700;color:#A33030;margin-bottom:3px;';
+  nameLabel.textContent = '品項名稱';
+  row.appendChild(nameLabel);
 
-  // 底部：圖片上傳 + 備用欄位
-  const bottom = document.createElement('div');
-  bottom.className = 'a-row-bottom';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = '請輸入品項名稱';
+  nameInput.value = item.name || '';
+  nameInput.style.cssText = 'width:100%;font-family:\'Noto Serif TC\',serif;font-size:.9rem;padding:8px 12px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;color:#2C1810;margin-bottom:8px;box-sizing:border-box;';
+  nameInput.oninput = function() { updF(cat, item.id, 'name', this.value); };
+  row.appendChild(nameInput);
 
-  // 圖片上傳
+  // ── 第二行：價格 + 刪除 ──
+  const priceRow = document.createElement('div');
+  priceRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+
+  const priceLabel = document.createElement('div');
+  priceLabel.style.cssText = 'font-size:.75rem;font-weight:700;color:#A33030;white-space:nowrap;';
+  priceLabel.textContent = '價格 $';
+  priceRow.appendChild(priceLabel);
+
+  const priceInput = document.createElement('input');
+  priceInput.type = 'number';
+  priceInput.placeholder = '0';
+  priceInput.value = item.price || 0;
+  priceInput.style.cssText = 'flex:1;font-family:\'Noto Serif TC\',serif;font-size:.9rem;padding:8px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;color:#2C1810;box-sizing:border-box;';
+  priceInput.oninput = function() { updF(cat, item.id, 'price', this.value); };
+  priceRow.appendChild(priceInput);
+
+  const delBtn = document.createElement('button');
+  delBtn.textContent = '刪除';
+  delBtn.style.cssText = 'background:#fee;border:1px solid #fcc;color:#c33;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.82rem;white-space:nowrap;flex-shrink:0;';
+  delBtn.onclick = function() { delF(cat, item.id); };
+  priceRow.appendChild(delBtn);
+  row.appendChild(priceRow);
+
+  // ── 第三行：圖片上傳 ──
+  const imgLabel = document.createElement('div');
+  imgLabel.style.cssText = 'font-size:.75rem;font-weight:700;color:#A33030;margin-bottom:4px;';
+  imgLabel.textContent = '商品圖片';
+  row.appendChild(imgLabel);
+
   const imgRow = document.createElement('div');
-  imgRow.className = 'a-img-row';
+  imgRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
 
   const preview = document.createElement('img');
-  preview.className = 'a-img-preview';
   preview.id = 'prev-' + item.id;
-  if (item.img) { preview.src = item.img; preview.style.display = 'block'; }
+  preview.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:8px;border:1.5px solid #EDD8C0;' + (item.img ? '' : 'display:none;');
+  if (item.img) preview.src = item.img;
+  imgRow.appendChild(preview);
 
-  const label = document.createElement('label');
-  label.className = 'a-img-label';
+  const uploadLabel = document.createElement('label');
+  uploadLabel.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--warm);border:1.5px dashed #E8B86D;border-radius:8px;cursor:pointer;font-size:.78rem;color:var(--red);font-weight:700;';
+  uploadLabel.textContent = '📷 上傳圖片';
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'image/*';
-  fileInput.onchange = (e) => handleImgUpload(e, cat, item.id);
-  label.appendChild(fileInput);
-  label.innerHTML += '📷 上傳圖片';
-  label.prepend(fileInput);
+  fileInput.style.display = 'none';
+  fileInput.onchange = function(e) { handleImgUpload(e, cat, item.id); };
+  uploadLabel.prepend(fileInput);
+  imgRow.appendChild(uploadLabel);
 
-  // 清除圖片按鈕
-  const clearImg = document.createElement('button');
-  clearImg.textContent = '✕';
-  clearImg.style.cssText = 'border:none;background:#fee;color:#c33;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.78rem;';
-  clearImg.title = '移除圖片';
-  clearImg.onclick = () => {
+  const clearImgBtn = document.createElement('button');
+  clearImgBtn.textContent = '✕ 移除';
+  clearImgBtn.style.cssText = 'border:none;background:#fee;color:#c33;border-radius:6px;padding:5px 9px;cursor:pointer;font-size:.78rem;';
+  clearImgBtn.onclick = function() {
     updF(cat, item.id, 'img', '');
     preview.src = ''; preview.style.display = 'none';
   };
+  imgRow.appendChild(clearImgBtn);
+  row.appendChild(imgRow);
 
-  imgRow.appendChild(preview);
-  imgRow.appendChild(label);
-  imgRow.appendChild(clearImg);
-  bottom.appendChild(imgRow);
+  // ── 第四行：備用欄位 ──
+  const extraLabel = document.createElement('div');
+  extraLabel.style.cssText = 'font-size:.75rem;font-weight:700;color:#A33030;margin-bottom:3px;';
+  extraLabel.textContent = '備用欄位（過敏原、說明等）';
+  row.appendChild(extraLabel);
 
-  // 備用欄位
   const extraInput = document.createElement('input');
   extraInput.type = 'text';
-  extraInput.placeholder = '備用欄位（例如：過敏原、製作說明、活動資訊…）';
+  extraInput.placeholder = '選填，會顯示在品項卡片下方';
   extraInput.value = item.extra || '';
-  extraInput.oninput = (e) => updF(cat, item.id, 'extra', e.target.value);
-  bottom.appendChild(extraInput);
+  extraInput.style.cssText = 'width:100%;font-family:\'Noto Serif TC\',serif;font-size:.85rem;padding:7px 10px;border:1.5px solid #EDD8C0;border-radius:8px;background:white;color:#2C1810;box-sizing:border-box;';
+  extraInput.oninput = function() { updF(cat, item.id, 'extra', this.value); };
+  row.appendChild(extraInput);
 
-  row.appendChild(bottom);
   return row;
 }
 
