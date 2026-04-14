@@ -215,14 +215,12 @@ textarea{resize:none;height:68px;}
 <div class="success-wrap" id="successWrap">
   <div class="success-box">
     <div class="s-icon">🎉</div>
-    <div class="s-label">您的訂單編號</div>
-    <div class="s-num" id="sNum">010</div>
     <div class="s-title">訂單明細！</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
     </div>
-    <button class="done-btn" onclick="closeDone()">✓ 訂單已截圖</button>
+    <button class="done-btn" onclick="closeDone()"> 訂單明細已拍照</button>
   </div>
 </div>
 
@@ -624,7 +622,7 @@ async function submitOrder() {
 
   if (!getWebhook()) {
     statusEl.className = 'send-status failed';
-    statusEl.innerHTML = '⚠️ 訂單截圖回傳到官方LINE，才會出餐';
+    statusEl.innerHTML = '⚠️ 訂單明細請拍照回傳到官方LINE，才會出餐';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
