@@ -163,7 +163,7 @@ textarea{resize:none;height:68px;}
 
 <header>
   <h1 id="logoTap" onclick="tapLogo()">🍞 GOOD DAY</h1>
-  <p>Tea & Toast — 線上點餐</p>
+  <p>線上點餐</p>
   <div class="hours">週一至週六　AM 6:00 – 10:00</div>
 </header>
 
@@ -215,9 +215,7 @@ textarea{resize:none;height:68px;}
 <div class="success-wrap" id="successWrap">
   <div class="success-box">
     <div class="s-icon">🎉</div>
-    <div class="s-label">您的訂單編號</div>
-    <div class="s-num" id="sNum">015</div>
-    <div class="s-title">訂單已送出！</div>
+    <div class="s-title">訂單明細</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
@@ -631,7 +629,7 @@ async function submitOrder() {
     statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
     statusEl.innerHTML = result === 'ok'
       ? '✅ 訂單已傳送！LINE 對話將出現確認訊息'
-      : '❌ 傳送失敗，請截圖告知店家';
+      : '❌ 訂單明細須拍照傳到官方line，才會出餐';
   }
   btn.disabled = false; btn.innerHTML = '送出訂單';
 }
