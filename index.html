@@ -217,7 +217,7 @@ textarea{resize:none;height:68px;}
     <div class="s-icon">🎉</div>
     <div class="s-label">您的訂單明細</div>
     <div class="s-num" id="sNum">018</div>
-    <div class="s-title">送出訂單後請回傳OK</div>
+    <div class="s-title">傳送成功請回傳OK</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
@@ -651,13 +651,14 @@ async function sendToLine(msg, userId, confirmMsg) {
     });
     const text = await res.text();
     if (!res.ok) return { status: 'error', message: `GAS 回應 ${res.status}` };
-    if (text) {
-      try {
-        const data = JSON.parse(text);
-        if (data.status && data.status !== 'ok') return { status: 'error', message: data.message || data.status };
-      } catch(e) {}
+    if (!text) return { status: 'error', message: 'GAS 沒有回傳 LINE 推送結果' };
+    try {
+      const data = JSON.parse(text);
+      if (data.status === 'ok') return { status: 'ok', message: 'ok' };
+      return { status: 'error', message: data.message || data.error || data.status || 'GAS 回傳失敗' };
+    } catch(e) {
+      return { status: 'error', message: `GAS 回傳格式不正確：${text.slice(0, 80)}` };
     }
-    return { status: 'ok', message: 'ok' };
   } catch(e) {
     return { status: 'error', message: e.message || '網路連線失敗' };
   }
