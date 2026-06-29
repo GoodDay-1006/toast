@@ -215,7 +215,9 @@ textarea{resize:none;height:68px;}
 <div class="success-wrap" id="successWrap">
   <div class="success-box">
     <div class="s-icon">🎉</div>
-    <div class="s-title">訂單明細</div>
+    <div class="s-label">您的訂單明細</div>
+    <div class="s-num" id="sNum">018</div>
+    <div class="s-title">明細請拍照傳到官方line</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
@@ -285,6 +287,9 @@ textarea{resize:none;height:68px;}
 // ══════════════════════════════════════════
 let lineUserId = null;
 let lineDisplayName = null;
+
+const DEFAULT_LIFF_ID = '2009741658-E1Z86q0b';
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzfDUplLpLK6JkUS6gCMq9Txgx-inInUcQlIvUFchqzryJ0DqvykprGEhpZOME9Ows/exec';
 
 async function initLiff() {
   const liffId = getLiffId();
@@ -373,9 +378,9 @@ let EVENT = (() => { try { const s = localStorage.getItem('gd_event'); return s 
 
 let qty = {};
 
-function getWebhook(){ return localStorage.getItem('gd_webhook') || ''; }
+function getWebhook(){ return localStorage.getItem('gd_webhook') || DEFAULT_WEBHOOK_URL; }
 function saveWebhook(){ localStorage.setItem('gd_webhook', document.getElementById('webhookUrl').value.trim()); }
-function getLiffId(){ return localStorage.getItem('gd_liff_id') || ''; }
+function getLiffId(){ return localStorage.getItem('gd_liff_id') || DEFAULT_LIFF_ID; }
 function saveLiffId(){ localStorage.setItem('gd_liff_id', document.getElementById('liffIdInput').value.trim()); }
 
 // ══════════════════════════════════════════
@@ -626,25 +631,36 @@ async function submitOrder() {
     statusEl.innerHTML = '⚠️ 訂單明細須拍照傳到官方line，才會出餐';
   } else {
     const result = await sendToLine(ownerMsg, lineUserId, confirmMsg);
-    statusEl.className = result === 'ok' ? 'send-status success' : 'send-status failed';
-    statusEl.innerHTML = result === 'ok'
+    const sent = result.status === 'ok';
+    statusEl.className = sent ? 'send-status success' : 'send-status failed';
+    statusEl.innerHTML = sent
       ? '✅ 訂單已傳送！LINE 對話將出現確認訊息'
-      : '❌ 訂單明細須拍照傳到官方line，才會出餐';
+      : `❌ 傳送失敗：${result.message}<br>訂單明細須拍照傳到官方line，才會出餐`;
   }
   btn.disabled = false; btn.innerHTML = '送出訂單';
 }
 
 async function sendToLine(msg, userId, confirmMsg) {
   const url = getWebhook();
-  if (!url) return 'no_webhook';
+  if (!url) return { status: 'error', message: '尚未設定 GAS 網址' };
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg, userId: userId || null, confirmMessage: confirmMsg || null })
     });
-    return res.ok ? 'ok' : 'error';
-  } catch(e) { return 'error'; }
+    const text = await res.text();
+    if (!res.ok) return { status: 'error', message: `GAS 回應 ${res.status}` };
+    if (text) {
+      try {
+        const data = JSON.parse(text);
+        if (data.status && data.status !== 'ok') return { status: 'error', message: data.message || data.status };
+      } catch(e) {}
+    }
+    return { status: 'ok', message: 'ok' };
+  } catch(e) {
+    return { status: 'error', message: e.message || '網路連線失敗' };
+  }
 }
 
 async function testWebhook() {
@@ -654,7 +670,7 @@ async function testWebhook() {
   btn.textContent = '傳送中…'; btn.disabled = true;
   const r = await sendToLine('🔔【GOOD DAY 測試】\n點餐系統連線測試成功！', null, null);
   btn.textContent = '🔔 測試傳送'; btn.disabled = false;
-  alert(r === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : '❌ 傳送失敗，請確認 GAS 網址');
+  alert(r.status === 'ok' ? '✅ 測試成功！已傳送到你的 LINE' : `❌ 傳送失敗：${r.message}`);
 }
 
 function closeDone(){ document.getElementById('successWrap').classList.remove('open'); }
