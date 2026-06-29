@@ -164,7 +164,7 @@ textarea{resize:none;height:68px;}
 <header>
   <h1 id="logoTap" onclick="tapLogo()">🍞 GOOD DAY</h1>
   <p>線上點餐</p>
-  <div class="hours">週一至週六　AM 6:00 – 10:00</div>
+  <div class="hours">週二至週六　AM 6:00 – 10:00</div>
 </header>
 
 <div class="tabs" id="tabs"></div>
@@ -192,7 +192,7 @@ textarea{resize:none;height:68px;}
       <input type="date" id="pickupDate">
     </div>
     <div class="field-group">
-      <label class="field-label">⏰ 取餐時間 <span class="req">*</span>（6:10–10:00）</label>
+      <label class="field-label">⏰ 取餐時間(必填)) <span class="req">*</span>（6:10–10:00）</label>
       <div class="field-row">
         <select id="pickupHour" onchange="updateMins()"></select>
         <select id="pickupMin"></select>
@@ -207,7 +207,7 @@ textarea{resize:none;height:68px;}
       <span id="cartTotal" style="color:var(--red)">$0</span>
     </div>
     <button class="submit-btn" id="submitBtn" onclick="submitOrder()">下一步</button>
-    <button class="clear-btn" onclick="clearCart()">清空購物車</button>
+    <button class="clear-btn" onclick="clearCart()">清空訂單</button>
   </div>
 </div>
 
@@ -217,12 +217,12 @@ textarea{resize:none;height:68px;}
     <div class="s-icon">🎉</div>
     <div class="s-label">您的訂單明細</div>
     <div class="s-num" id="sNum">018</div>
-    <div class="s-title">明細請拍照傳到官方line</div>
+    <div class="s-title">送出訂單後請回傳OK</div>
     <div class="s-detail" id="sDetail"></div>
     <div class="send-status sending" id="sendStatus">
       <span class="spinner"></span> 正在傳送訂單…
     </div>
-    <button class="done-btn" onclick="closeDone()">再次確認，訂單明細已拍照</button>
+    <button class="done-btn" onclick="closeDone()">完成</button>
   </div>
 </div>
 
@@ -289,7 +289,7 @@ let lineUserId = null;
 let lineDisplayName = null;
 
 const DEFAULT_LIFF_ID = '2009741658-E1Z86q0b';
-const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzfDUplLpLK6JkUS6gCMq9Txgx-inInUcQlIvUFchqzryJ0DqvykprGEhpZOME9Ows/exec';
+const DEFAULT_WEBHOOK_URL = '/api/order';
 
 async function initLiff() {
   const liffId = getLiffId();
@@ -319,7 +319,7 @@ async function getCloudOrderNum() {
   try {
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'getOrderNum' })
     });
     const data = await res.json();
@@ -646,7 +646,7 @@ async function sendToLine(msg, userId, confirmMsg) {
   try {
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ message: msg, userId: userId || null, confirmMessage: confirmMsg || null })
     });
     const text = await res.text();
